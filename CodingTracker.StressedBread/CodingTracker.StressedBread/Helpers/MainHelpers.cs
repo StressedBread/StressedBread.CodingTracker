@@ -1,8 +1,8 @@
 ﻿using Spectre.Console;
 
-namespace CodingTracker.StressedBread;
+namespace CodingTracker.StressedBread.Helpers;
 
-class Helpers
+class MainHelpers
 {
     Validation validation = new();
 
@@ -18,8 +18,6 @@ class Helpers
     }
     internal int DurationCalculation(DateTime startTime, DateTime endTime)
     {
-        DateTime startsTime = DateTime.Parse("01/01/2011 00:00");
-        DateTime endsTime = DateTime.Parse("01/01/2011 01:00");
         double duration = (endTime - startTime).TotalMinutes;
         return (int)Math.Round(duration);
     }

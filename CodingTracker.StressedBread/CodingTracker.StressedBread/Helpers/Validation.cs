@@ -1,7 +1,7 @@
 ﻿using Spectre.Console;
 using System.Globalization;
 
-namespace CodingTracker.StressedBread;
+namespace CodingTracker.StressedBread.Helpers;
 
 internal class Validation
 {
@@ -41,11 +41,6 @@ internal class Validation
     }
     public bool DurationValidation(int duration)
     {
-        return duration < 0 ? false : true;
-    }
-    internal void ShowInvalidMessage()
-    {
-        Console.Clear();
-        AnsiConsole.MarkupLine("[red]Invalid input. Duration cannot be negative.[/]");
+        return duration >= 0;
     }
 }

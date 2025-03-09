@@ -1,8 +1,8 @@
-﻿using CodingTracker.StressedBread;
-using CodingTracker.StressedBread.Controllers;
+﻿using CodingTracker.StressedBread.Controllers;
+using CodingTracker.StressedBread.UI;
 
-UserInterface ui = new();
+MainMenu ui = new();
 CodingController codingController = new();
 
 codingController.CreateTableOnStart();
-ui.MainMenu();
+ui.Menu();

@@ -1,14 +1,15 @@
-﻿using Spectre.Console;
+﻿using CodingTracker.StressedBread.Helpers;
+using Spectre.Console;
 using static CodingTracker.StressedBread.Enums;
 
-namespace CodingTracker.StressedBread;
+namespace CodingTracker.StressedBread.UI;
 
-internal class UserInterface
+internal class MainMenu
 {
     RecordHelper recordHelper = new();
-    Helpers helpers = new();
+    MainHelpers mainHelpers = new();
 
-    internal void MainMenu()
+    internal void Menu()
     {
         while (true)
         {
@@ -37,7 +38,7 @@ internal class UserInterface
                     break;
 
                 case MenuChoice.CloseApplication:
-                    helpers.CloseApplication();
+                    mainHelpers.CloseApplication();
                     break;
             }
         }

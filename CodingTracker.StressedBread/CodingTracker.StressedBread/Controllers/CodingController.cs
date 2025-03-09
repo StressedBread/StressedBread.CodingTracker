@@ -26,7 +26,7 @@ internal class CodingController
         return databaseController.Reader(query);
     }
 
-    internal void AddRecord(CodingSession session)
+    internal void AddRecordQuery(CodingSession session)
     {
         var query = @"
             INSERT INTO CodingTracker (StartTime, EndTime, Duration)
@@ -41,7 +41,7 @@ internal class CodingController
         databaseController.Execute(query, parameters);
     }
 
-    internal void EditRecord(CodingSession session)
+    internal void EditRecordQuery(CodingSession session)
     {
         DynamicParameters parameters = new();
 
@@ -68,7 +68,7 @@ internal class CodingController
             case EditChoice.Both:
                 query = @"
                         UPDATE CodingTracker 
-                        SET StartTime = @StartTime, EndTime = @EndTime, Duration = @Duration
+                        SET StartTime = @startTime, EndTime = @endTime, Duration = @duration
                         WHERE Id = @id";
                 parameters.Add("@startTime", session.StartTime);
                 parameters.Add("@endTime", session.EndTime);
@@ -77,7 +77,7 @@ internal class CodingController
 
         databaseController.Execute(query, parameters);
     }    
-    internal void DeleteRecord(long id)
+    internal void DeleteRecordQuery(long id)
     {
         var query = @"
             DELETE FROM CodingTracker
