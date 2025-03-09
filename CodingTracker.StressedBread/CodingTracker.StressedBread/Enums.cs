@@ -10,4 +10,11 @@ internal class Enums
         DeleteRecord,
         CloseApplication
     };
+
+    internal enum EditChoice
+    {
+        StartTime,
+        EndTime,
+        Both
+    };
 }

@@ -1,5 +1,6 @@
-﻿using Dapper;
-using Microsoft.Data.Sqlite;
+﻿using CodingTracker.StressedBread.Model;
+using Dapper;
+using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.Controllers;
 
@@ -12,13 +13,20 @@ internal class CodingController
             CREATE TABLE IF NOT EXISTS CodingTracker (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 StartTime TEXT,
-                EndTIme TEXT,
+                EndTime TEXT,
                 Duration INTEGER
             )";
         databaseController.Execute(query);
     }
 
-    internal void AddRecord(DateTime startTime, DateTime endTime, int duration)
+    internal List<CodingSession> ViewRecords()
+    {
+        var query = @"
+            SELECT * FROM CodingTracker";
+        return databaseController.Reader(query);
+    }
+
+    internal void AddRecord(CodingSession session)
     {
         var query = @"
             INSERT INTO CodingTracker (StartTime, EndTime, Duration)
@@ -26,16 +34,59 @@ internal class CodingController
         
         DynamicParameters parameters = new();
         
-        parameters.Add("@StartTime", startTime);
-        parameters.Add("@EndTime", endTime);
-        parameters.Add("@Duration", duration);
+        parameters.Add("@StartTime", session.StartTime);
+        parameters.Add("@EndTime", session.EndTime);
+        parameters.Add("@Duration", session.Duration);
 
         databaseController.Execute(query, parameters);
     }
 
-    internal int DurationCalculation(DateTime startTime, DateTime endTime)
+    internal void EditRecord(CodingSession session)
     {
-        int duration = (int)(endTime - startTime).TotalMinutes;
-        return duration;
+        DynamicParameters parameters = new();
+
+        var query = @"";
+        parameters.Add("@id", session.Id);
+        parameters.Add("@duration", session.Duration);
+
+        switch (session.Choice)
+        {
+            case EditChoice.StartTime:
+                query = @"
+                        UPDATE CodingTracker 
+                        SET StartTime = @startTime, Duration = @duration
+                        WHERE Id = @id";
+                parameters.Add("@startTime", session.StartTime);
+                break;
+            case EditChoice.EndTime:
+                query = @"
+                        UPDATE CodingTracker 
+                        SET EndTime = @endTime, Duration = @duration
+                        WHERE Id = @id";
+                parameters.Add("@endTime", session.EndTime);
+                break;
+            case EditChoice.Both:
+                query = @"
+                        UPDATE CodingTracker 
+                        SET StartTime = @StartTime, EndTime = @EndTime, Duration = @Duration
+                        WHERE Id = @id";
+                parameters.Add("@startTime", session.StartTime);
+                parameters.Add("@endTime", session.EndTime);
+                break;
+        }
+
+        databaseController.Execute(query, parameters);
+    }    
+    internal void DeleteRecord(long id)
+    {
+        var query = @"
+            DELETE FROM CodingTracker
+            WHERE Id = @id";
+
+        DynamicParameters parameters = new();
+
+        parameters.Add("@id", id);
+
+        databaseController.Execute(query, parameters);
     }
 }
