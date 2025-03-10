@@ -92,7 +92,7 @@ internal class RecordUI
         bool confirmation = AnsiConsole.Prompt(new ConfirmationPrompt(text));
         return confirmation;
     }
-    internal bool StartCodingSessionDisplay(StopWatchManager stopWatchManager, ref bool isRunning)
+    internal bool StartCodingSessionDisplay(StopWatchSession stopWatchSession, ref bool isRunning)
     {
         Console.Clear();
         while (isRunning)
@@ -117,7 +117,7 @@ internal class RecordUI
                 }
             }
 
-            AnsiConsole.Markup($"Elapsed time:[grey50] {stopWatchManager.GetFormattedElapsedTime()}[/]");
+            AnsiConsole.Markup($"Elapsed time:[grey50] {stopWatchSession.GetFormattedElapsedTime()}[/]");
             Thread.Sleep(1000);
         }
         return false;

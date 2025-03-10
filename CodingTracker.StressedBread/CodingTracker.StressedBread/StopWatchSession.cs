@@ -2,45 +2,49 @@
 using CodingTracker.StressedBread.Helpers;
 using CodingTracker.StressedBread.Model;
 using CodingTracker.StressedBread.UI;
+using System.Diagnostics;
 
 namespace CodingTracker.StressedBread;
 
 internal class StopWatchSession
 {
     RecordUI recordUI = new();
-    StopWatchManager stopWatchManager = new();
     MainHelpers mainHelpers = new();
     CodingController codingController = new();
+    public Stopwatch stopwatch = new();
 
     internal void StartSession()
     {
-        stopWatchManager.Reset();
-        stopWatchManager.Start();
+        stopwatch.Reset();
+        stopwatch.Start();
 
         DateTime startTime = DateTime.Now;
 
-        bool isRunning = true;
-        bool saveSession;
+        bool isRunning = true, saveSession;
 
-        saveSession = recordUI.StartCodingSessionDisplay(stopWatchManager, ref isRunning);
+        saveSession = recordUI.StartCodingSessionDisplay(this, ref isRunning);
         if (saveSession)
         {
             SaveSession(startTime);
         }
 
-        stopWatchManager.Stop();
+        stopwatch.Stop();
     }
-
     internal void SaveSession(DateTime startTime)
     {
         DateTime endTime = DateTime.Now;
+        string startFormattedTime, endFormattedTime;
+        int durationOut;
 
-        string endFormattedTime = mainHelpers.FormattedDateTime(endTime);
-        string startFormattedTime = mainHelpers.FormattedDateTime(startTime);
+        (startFormattedTime, endFormattedTime, durationOut) =  mainHelpers.ProcessDateTime(startTime, endTime);
 
-        int duration = mainHelpers.DurationCalculation(startTime, endTime);
-
-        CodingSession codingSession = new(startFormattedTime, endFormattedTime, duration);
+        CodingSession codingSession = new(startFormattedTime, endFormattedTime, durationOut);
         codingController.AddRecordQuery(codingSession);
     }
+    internal string GetFormattedElapsedTime()
+    {
+        TimeSpan elapsed = stopwatch.Elapsed;
+        return elapsed.ToString(@"hh\:mm\:ss");
+    }
+
 }

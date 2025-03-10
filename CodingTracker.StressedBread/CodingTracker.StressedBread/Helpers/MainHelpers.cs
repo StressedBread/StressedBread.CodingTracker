@@ -1,5 +1,7 @@
-﻿using Spectre.Console;
+﻿using CodingTracker.StressedBread.Model;
+using Spectre.Console;
 using System.Globalization;
+using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.Helpers;
 
@@ -31,5 +33,41 @@ class MainHelpers
     internal string FormattedDateTime(DateTime dateTime)
     {
         return dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+    }
+    internal (string startDateTimeOut, string endDateTimeOut, int durationOut) GetInputAndDuration(DateTime startDateTime, DateTime endDateTime)
+    {
+       return ProcessDateTime(startDateTime, endDateTime);
+    }
+    internal (string startDateTimeOut, string endDateTimeOut, int durationOut) GetInputAndDuration(DateTime startDateTime, DateTime endDateTime, CodingSession recordToEdit, EditChoice editChoice)
+    {
+        string startFormattedTime = recordToEdit.StartTime;
+        string endFormattedTime = recordToEdit.EndTime;
+
+        switch (editChoice)
+        {
+            case EditChoice.StartTime:
+                startFormattedTime = FormattedDateTime(startDateTime);
+                break;
+
+            case EditChoice.EndTime:
+                endFormattedTime = FormattedDateTime(endDateTime);
+                break;
+
+            case EditChoice.Both:
+                return ProcessDateTime(startDateTime, endDateTime);
+        }
+
+        int duration = DurationCalculation(startDateTime, endDateTime);
+
+        return (startFormattedTime, endFormattedTime, duration);
+    }
+    internal (string startDateTimeOut, string endDateTimeOut, int durationOut) ProcessDateTime(DateTime startDateTime, DateTime endDateTime)
+    {
+        string startFormattedTime = FormattedDateTime(startDateTime);
+        string endFormattedTime = FormattedDateTime(endDateTime);
+
+        int duration = DurationCalculation(startDateTime, endDateTime);
+
+        return (startFormattedTime, endFormattedTime, duration);
     }
 }

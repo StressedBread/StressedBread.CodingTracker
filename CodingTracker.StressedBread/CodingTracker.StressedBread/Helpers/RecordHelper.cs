@@ -19,11 +19,10 @@ internal class RecordHelper
     }
     internal void AddRecordHelper()
     {
-        string startDateTimeOut;
-        string endDateTimeOut;
+        string startDateTimeOut, endDateTimeOut;
         int durationOut;
 
-        (startDateTimeOut, endDateTimeOut, durationOut) = GetAddInputAndDuration();
+        (startDateTimeOut, endDateTimeOut, durationOut) = mainHelpers.GetInputAndDuration(mainHelpers.GetInput("start"), mainHelpers.GetInput("end"));
 
         if (!validation.DurationValidation(durationOut))
         {
@@ -36,8 +35,7 @@ internal class RecordHelper
     }
     internal void EditRecordHelper()
     {
-        string startDateTimeOut;
-        string endDateTimeOut;
+        string startDateTimeOut, endDateTimeOut;
         int durationOut;
 
         var recordToEdit = recordUI.RecordToSelect("edit");
@@ -46,7 +44,26 @@ internal class RecordHelper
 
         var editChoice = recordUI.GetEditChoice();
 
-        (startDateTimeOut, endDateTimeOut, durationOut) = GetEditInputAndDuration(recordToEdit, editChoice);
+        DateTime newStartDateTime = DateTime.Parse(recordToEdit.StartTime);
+        DateTime newEndDateTime = DateTime.Parse(recordToEdit.EndTime);
+
+        switch (editChoice)
+        {
+            case EditChoice.StartTime:
+                newStartDateTime = mainHelpers.GetInput("start");
+                break;
+
+            case EditChoice.EndTime:
+                newEndDateTime = mainHelpers.GetInput("end");
+                break;
+
+            case EditChoice.Both:
+                newStartDateTime = mainHelpers.GetInput("start");
+                newEndDateTime = mainHelpers.GetInput("end");
+                break;
+        }
+
+        (startDateTimeOut, endDateTimeOut, durationOut) = mainHelpers.GetInputAndDuration(newStartDateTime, newEndDateTime, recordToEdit, editChoice);
 
         if (!validation.DurationValidation(durationOut))
         {
@@ -54,20 +71,8 @@ internal class RecordHelper
             return;
         }
 
-        switch (editChoice)
-        {
-            case EditChoice.StartTime:
-                UpdateRecord(recordToEdit.Id, startDateTimeOut, recordToEdit.EndTime, durationOut, EditChoice.StartTime);
-                break;
-
-            case EditChoice.EndTime:
-                UpdateRecord(recordToEdit.Id, recordToEdit.StartTime, endDateTimeOut, durationOut, EditChoice.EndTime);
-                break;
-
-            case EditChoice.Both:
-                UpdateRecord(recordToEdit.Id, startDateTimeOut, endDateTimeOut, durationOut, EditChoice.Both);
-                break;
-        }
+        CodingSession codingSession = new(recordToEdit.Id, startDateTimeOut, endDateTimeOut, durationOut);
+        codingController.EditRecordQuery(codingSession);
 
         recordUI.ShowSuccessMessage("updated");
     }
@@ -80,64 +85,5 @@ internal class RecordHelper
             recordUI.ShowSuccessMessage("deleted");
         }
 
-    }
-    private (string startDateTimeOut, string endDateTimeOut, int durationOut) GetEditInputAndDuration(CodingSession recordToEdit, EditChoice editChoice)
-    {
-        DateTime startDateTime;
-        DateTime endDateTime;
-        int duration;
-        string startFormattedTime;
-        string endFormattedTime;
-
-        switch (editChoice)
-        {
-            case EditChoice.StartTime:
-                startDateTime = mainHelpers.GetInput("end");
-
-                startFormattedTime = mainHelpers.FormattedDateTime(startDateTime);
-
-                duration = mainHelpers.DurationCalculation(startDateTime, DateTime.Parse(recordToEdit.EndTime));
-                validation.DurationValidation(duration);
-                return (startFormattedTime, recordToEdit.EndTime, duration);
-
-            case EditChoice.EndTime:
-                endDateTime = mainHelpers.GetInput("end");
-
-                endFormattedTime = mainHelpers.FormattedDateTime(endDateTime);
-
-                duration = mainHelpers.DurationCalculation(DateTime.Parse(recordToEdit.StartTime), endDateTime);
-                validation.DurationValidation(duration);
-                return (recordToEdit.StartTime, endFormattedTime, duration);
-
-            case EditChoice.Both:
-                startDateTime = mainHelpers.GetInput("end");
-                endDateTime = mainHelpers.GetInput("end");
-
-                startFormattedTime = mainHelpers.FormattedDateTime(startDateTime);
-                endFormattedTime = mainHelpers.FormattedDateTime(endDateTime);
-
-                duration = mainHelpers.DurationCalculation(startDateTime, endDateTime);
-                validation.DurationValidation(duration);
-                return (startFormattedTime, endFormattedTime, duration);
-
-            default:
-                return (recordToEdit.StartTime, recordToEdit.EndTime, (int)recordToEdit.Duration);
-        }
-    }
-    private (string startDateTimeOut, string endDateTimeOut, int durationOut) GetAddInputAndDuration()
-    {
-        DateTime startDateTime = mainHelpers.GetInput("start");
-        DateTime endDateTime = mainHelpers.GetInput("end");
-
-        string startFormattedTime = mainHelpers.FormattedDateTime(startDateTime);
-        string endFormattedTime = mainHelpers.FormattedDateTime(endDateTime);
-
-        int duration = mainHelpers.DurationCalculation(startDateTime, endDateTime);
-        return (startFormattedTime, endFormattedTime, duration);
-    }
-    private void UpdateRecord(long id, string startTime, string endTime, int duration, EditChoice choice)
-    {
-        CodingSession codingSession = new(id, startTime, endTime, duration, choice);
-        codingController.EditRecordQuery(codingSession);
     }
 }
