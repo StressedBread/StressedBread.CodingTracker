@@ -24,8 +24,14 @@ internal class Enums
         Day,
         Week,
         Month,
-        Year,
-        Ascending,
-        Descending
+        Year
+    }
+
+    internal enum AscendingType
+    {
+        Id,
+        StartTime,
+        EndTime,
+        Duration
     }
 }

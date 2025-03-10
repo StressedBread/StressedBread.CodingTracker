@@ -11,7 +11,7 @@ class MainHelpers
 
     internal DateTime GetInput(string inputType)
     {
-        AnsiConsole.MarkupLine($"Enter the new [darkorange]{inputType}[/] time of the coding session in the format:\n[darkorange bold]Day(s)/Month(s)/Year Hour(s):Minute(s) (24-hour format)[/]");
+        AnsiConsole.MarkupLine($"Enter the new [darkorange]{inputType}[/] date and time of the coding session in the format:\n[darkorange bold]Day(s)/Month(s)/Year Hour(s):Minute(s) (24-hour format)[/]");
         string newTime = AnsiConsole.Ask<string>("");
         return validation.DateTimeValidation(newTime);
     }

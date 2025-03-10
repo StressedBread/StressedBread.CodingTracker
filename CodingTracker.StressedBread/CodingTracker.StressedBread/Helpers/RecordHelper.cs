@@ -1,6 +1,8 @@
-﻿using CodingTracker.StressedBread.Controllers;
+﻿using System.Globalization;
+using CodingTracker.StressedBread.Controllers;
 using CodingTracker.StressedBread.Model;
 using CodingTracker.StressedBread.UI;
+using Spectre.Console;
 using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.Helpers;
@@ -88,11 +90,7 @@ internal class RecordHelper
     }
     internal void FilterRecordsHelper()
     {
-        var records = codingController.FilteredRecordsQuery(FilterTypes.Week, 
-            mainHelpers.FormattedDateTime(DateTime.Now.AddYears(-1)), 
-            mainHelpers.FormattedDateTime(DateTime.Now.AddYears(1)));
-
-        recordUI.DisplayData(records, true);
+        AnsiConsole.MarkupLine("Not implemented");
         Console.ReadKey();
     }
 }

@@ -89,28 +89,42 @@ internal class CodingController
 
         databaseController.Execute(query, parameters);
     }
-    internal List<CodingSession> FilteredRecordsQuery(FilterTypes filterType, string startDateTime, string endDateTime)
+
+    //TODO: Implement filters
+    internal List<CodingSession> FilteredRecordsQuery(FilterTypes filterType, string? startDateTime, string? endDateTime, bool isAscending = true, AscendingType ascendingType = AscendingType.Id)
     {
         DynamicParameters parameters = new();
         string query = "SELECT * FROM CodingTracker WHERE 1=1";
 
-        switch (filterType)
+        Dictionary<FilterTypes, string> filterTypes = new()
         {
-            case FilterTypes.Day:
-                query += " AND DATE(StartTime) = @startDateTime";
-                break;
-            case FilterTypes.Week:
-                query += " AND STRFTIME('%Y-%W', StartTime) = @startDateTime";
-                break;
-            case FilterTypes.Month:
-                query += " AND STRFTIME('%Y-%m', StartTime) = @startDateTime";
-                break;
-            case FilterTypes.Year:
-                query += " AND STRFTIME('%Y', StartTime) = @startDateTime";
-                break;
+            { FilterTypes.Day, "DATE(StartTime)" },
+            { FilterTypes.Week, "STRFTIME('%Y-%W', StartTime)" },
+            { FilterTypes.Month, "STRFTIME('%Y-%m', StartTime)" },
+            { FilterTypes.Year, "STRFTIME('%Y', StartTime)" }
+        };
+
+        if (filterTypes.TryGetValue(filterType, out string? filter))
+        {
+            if (!string.IsNullOrEmpty(startDateTime))
+            {
+                query += $" AND {filter} >= @startDateTime";
+                parameters.Add("@startDateTime", startDateTime);
+            }
+            else if (!string.IsNullOrEmpty(endDateTime))
+            {
+                query += $" AND {filter} <= @endDateTime";
+                parameters.Add("@endDateTime", endDateTime);
+            }
+            else if (!string.IsNullOrEmpty(startDateTime) && !string.IsNullOrEmpty(endDateTime))
+            {
+                query += $" AND {filter} BETWEEN @startDateTime AND @endDateTime";
+                parameters.Add("@startDateTime", startDateTime);
+                parameters.Add("@endDateTime", endDateTime);
+            }
         }
 
-        parameters.Add("@startDateTime", startDateTime);
+        query += isAscending ? $" ORDER BY {ascendingType} ASC" : $" ORDER BY {ascendingType} DESC";
 
         return databaseController.Reader(query, parameters);
     }

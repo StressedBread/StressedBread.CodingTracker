@@ -125,5 +125,5 @@ internal class RecordUI
             Thread.Sleep(1000);
         }
         return false;
-    }
+    }    
 }
