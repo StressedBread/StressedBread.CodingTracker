@@ -14,8 +14,7 @@ internal class RecordHelper
     internal void ViewRecordsHelper()
     {
         var records = codingController.ViewRecordsQuery();
-        recordUI.DisplayData(records);
-        Console.ReadKey();
+        if (recordUI.DisplayData(records, false)) FilterRecordsHelper();
     }
     internal void AddRecordHelper()
     {
@@ -77,13 +76,23 @@ internal class RecordHelper
         recordUI.ShowSuccessMessage("updated");
     }
     internal void DeleteRecordHelper()
-    {
+    {        
         var recordToDelete = recordUI.RecordToSelect("delete");
+        Console.Clear();
         if (recordUI.ConfirmationPrompt("Are you sure?"))
         {
             codingController.DeleteRecordQuery(recordToDelete.Id);
             recordUI.ShowSuccessMessage("deleted");
         }
 
+    }
+    internal void FilterRecordsHelper()
+    {
+        var records = codingController.FilteredRecordsQuery(FilterTypes.Week, 
+            mainHelpers.FormattedDateTime(DateTime.Now.AddYears(-1)), 
+            mainHelpers.FormattedDateTime(DateTime.Now.AddYears(1)));
+
+        recordUI.DisplayData(records, true);
+        Console.ReadKey();
     }
 }

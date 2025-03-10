@@ -18,12 +18,12 @@ internal class DatabaseController
         }
     }
     
-    internal List<CodingSession> Reader(string query)
+    internal List<CodingSession> Reader(string query, object? parameters = null)
     {
         using (var connection = new SqliteConnection(connectionString))
         {
             connection.Open();
-            return connection.Query<CodingSession>(query).ToList();
+            return connection.Query<CodingSession>(query, parameters).ToList();
         }
     }
 }

@@ -36,7 +36,12 @@ class MainHelpers
     }
     internal (string startDateTimeOut, string endDateTimeOut, int durationOut) GetInputAndDuration(DateTime startDateTime, DateTime endDateTime)
     {
-       return ProcessDateTime(startDateTime, endDateTime);
+        string startFormattedTime = FormattedDateTime(startDateTime);
+        string endFormattedTime = FormattedDateTime(endDateTime);
+
+        int duration = DurationCalculation(startDateTime, endDateTime);
+
+        return (startFormattedTime, endFormattedTime, duration);
     }
     internal (string startDateTimeOut, string endDateTimeOut, int durationOut) GetInputAndDuration(DateTime startDateTime, DateTime endDateTime, CodingSession recordToEdit, EditChoice editChoice)
     {
@@ -54,17 +59,8 @@ class MainHelpers
                 break;
 
             case EditChoice.Both:
-                return ProcessDateTime(startDateTime, endDateTime);
+                return GetInputAndDuration(startDateTime, endDateTime);
         }
-
-        int duration = DurationCalculation(startDateTime, endDateTime);
-
-        return (startFormattedTime, endFormattedTime, duration);
-    }
-    internal (string startDateTimeOut, string endDateTimeOut, int durationOut) ProcessDateTime(DateTime startDateTime, DateTime endDateTime)
-    {
-        string startFormattedTime = FormattedDateTime(startDateTime);
-        string endFormattedTime = FormattedDateTime(endDateTime);
 
         int duration = DurationCalculation(startDateTime, endDateTime);
 

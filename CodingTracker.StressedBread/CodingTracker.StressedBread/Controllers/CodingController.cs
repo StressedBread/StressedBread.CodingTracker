@@ -89,8 +89,9 @@ internal class CodingController
 
         databaseController.Execute(query, parameters);
     }
-    internal void FilteredRecordsQuery(FilterTypes filterType, DateTime startDateTime, DateTime endDateTime)
+    internal List<CodingSession> FilteredRecordsQuery(FilterTypes filterType, string startDateTime, string endDateTime)
     {
+        DynamicParameters parameters = new();
         string query = "SELECT * FROM CodingTracker WHERE 1=1";
 
         switch (filterType)
@@ -98,6 +99,19 @@ internal class CodingController
             case FilterTypes.Day:
                 query += " AND DATE(StartTime) = @startDateTime";
                 break;
+            case FilterTypes.Week:
+                query += " AND STRFTIME('%Y-%W', StartTime) = @startDateTime";
+                break;
+            case FilterTypes.Month:
+                query += " AND STRFTIME('%Y-%m', StartTime) = @startDateTime";
+                break;
+            case FilterTypes.Year:
+                query += " AND STRFTIME('%Y', StartTime) = @startDateTime";
+                break;
         }
+
+        parameters.Add("@startDateTime", startDateTime);
+
+        return databaseController.Reader(query, parameters);
     }
 }

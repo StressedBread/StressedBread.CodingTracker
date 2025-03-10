@@ -8,10 +8,10 @@ namespace CodingTracker.StressedBread;
 
 internal class StopWatchSession
 {
-    RecordUI recordUI = new();
     MainHelpers mainHelpers = new();
     CodingController codingController = new();
     public Stopwatch stopwatch = new();
+    RecordUI recordUI = new();
 
     internal void StartSession()
     {
@@ -36,7 +36,7 @@ internal class StopWatchSession
         string startFormattedTime, endFormattedTime;
         int durationOut;
 
-        (startFormattedTime, endFormattedTime, durationOut) =  mainHelpers.ProcessDateTime(startTime, endTime);
+        (startFormattedTime, endFormattedTime, durationOut) =  mainHelpers.GetInputAndDuration(startTime, endTime);
 
         CodingSession codingSession = new(startFormattedTime, endFormattedTime, durationOut);
         codingController.AddRecordQuery(codingSession);

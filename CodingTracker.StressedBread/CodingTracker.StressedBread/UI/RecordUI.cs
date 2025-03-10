@@ -12,7 +12,7 @@ internal class RecordUI
     CodingController codingController = new();
     MainHelpers mainHelpers = new();
 
-    internal void DisplayData(List<CodingSession> records)
+    internal bool DisplayData(List<CodingSession> records, bool filtered)
     {
         Table table = new();
 
@@ -46,6 +46,11 @@ internal class RecordUI
         }
 
         AnsiConsole.Write(table);
+
+        if (!filtered)
+            return ConfirmationPrompt("Do you wish to filter?");
+
+        return false;
     }
     internal CodingSession RecordToSelect(string op)
     {
@@ -88,7 +93,6 @@ internal class RecordUI
     }
     internal bool ConfirmationPrompt(string text)
     {
-        Console.Clear();
         bool confirmation = AnsiConsole.Prompt(new ConfirmationPrompt(text));
         return confirmation;
     }
