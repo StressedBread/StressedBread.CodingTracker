@@ -7,7 +7,7 @@ namespace CodingTracker.StressedBread.Controllers;
 internal class CodingController
 {
     DatabaseController databaseController = new();
-    internal void CreateTableOnStart()
+    internal void CreateTableOnStartQuery()
     {
         var query = @"
             CREATE TABLE IF NOT EXISTS CodingTracker (
@@ -19,7 +19,7 @@ internal class CodingController
         databaseController.Execute(query);
     }
 
-    internal List<CodingSession> ViewRecords()
+    internal List<CodingSession> ViewRecordsQuery()
     {
         var query = @"
             SELECT * FROM CodingTracker";
@@ -31,9 +31,9 @@ internal class CodingController
         var query = @"
             INSERT INTO CodingTracker (StartTime, EndTime, Duration)
             VALUES (@StartTime, @EndTime, @Duration)";
-        
+
         DynamicParameters parameters = new();
-        
+
         parameters.Add("@StartTime", session.StartTime);
         parameters.Add("@EndTime", session.EndTime);
         parameters.Add("@Duration", session.Duration);
@@ -76,7 +76,7 @@ internal class CodingController
         }
 
         databaseController.Execute(query, parameters);
-    }    
+    }
     internal void DeleteRecordQuery(long id)
     {
         var query = @"
@@ -88,5 +88,16 @@ internal class CodingController
         parameters.Add("@id", id);
 
         databaseController.Execute(query, parameters);
+    }
+    internal void FilteredRecordsQuery(FilterTypes filterType, DateTime startDateTime, DateTime endDateTime)
+    {
+        string query = "SELECT * FROM CodingTracker WHERE 1=1";
+
+        switch (filterType)
+        {
+            case FilterTypes.Day:
+                query += " AND DATE(StartTime) = @startDateTime";
+                break;
+        }
     }
 }

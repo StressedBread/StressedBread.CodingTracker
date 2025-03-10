@@ -8,6 +8,7 @@ internal class Enums
         AddRecord,
         EditRecord,
         DeleteRecord,
+        CodingSession,
         CloseApplication
     };
 
@@ -17,4 +18,14 @@ internal class Enums
         EndTime,
         Both
     };
+
+    internal enum FilterTypes
+    {
+        Day,
+        Week,
+        Month,
+        Year,
+        Ascending,
+        Descending
+    }
 }

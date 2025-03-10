@@ -4,5 +4,5 @@ using CodingTracker.StressedBread.UI;
 MainMenu ui = new();
 CodingController codingController = new();
 
-codingController.CreateTableOnStart();
+codingController.CreateTableOnStartQuery();
 ui.Menu();

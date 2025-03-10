@@ -8,6 +8,7 @@ internal class MainMenu
 {
     RecordHelper recordHelper = new();
     MainHelpers mainHelpers = new();
+    StopWatchSession stopWatchSession = new();
 
     internal void Menu()
     {
@@ -37,6 +38,10 @@ internal class MainMenu
                     recordHelper.DeleteRecordHelper();
                     break;
 
+                case MenuChoice.CodingSession:
+                    stopWatchSession.StartSession();
+                    break;
+
                 case MenuChoice.CloseApplication:
                     mainHelpers.CloseApplication();
                     break;
@@ -44,5 +49,5 @@ internal class MainMenu
         }
     }
 
-    
+
 }

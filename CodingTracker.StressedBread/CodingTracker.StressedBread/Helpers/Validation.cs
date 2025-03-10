@@ -7,8 +7,8 @@ internal class Validation
 {
     public DateTime DateTimeValidation(string time)
     {
-        string[] formattedDateTime = 
-        { 
+        string[] formattedDateTime =
+        {
             "dd/MM/yyyy HH:mm",
             "d/M/yyyy HH:mm",
             "dd/M/yyyy HH:mm",
