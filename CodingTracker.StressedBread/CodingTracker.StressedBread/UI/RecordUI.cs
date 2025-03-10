@@ -79,6 +79,32 @@ internal class RecordUI
             .Title("Select what to edit")
             .AddChoices(Enum.GetValues<EditChoice>()));
     }
+    internal string GetInput(string inputType, FilterPeriod filterPeriod = FilterPeriod.Day)
+    {
+        switch (filterPeriod)
+        {
+            case FilterPeriod.Day:
+                AnsiConsole.MarkupLine($"Enter the [darkorange]{inputType}[/] date and time of the coding session in the format:" + 
+                    "\n[darkorange bold]Day(s)/Month(s)/Year Hour(s):Minute(s):Second(s) (24-hour format)[/]\n" + 
+                    "[red bold]If filtering, exlude time![/]");
+                return AnsiConsole.Ask<string>("");
+
+            case FilterPeriod.Week:
+                AnsiConsole.MarkupLine($"Enter the [darkorange bold]{inputType}[/] to filter by.");
+                return AnsiConsole.Ask<string>("");
+
+            case FilterPeriod.Month:
+                AnsiConsole.MarkupLine($"Enter the [darkorange bold]{inputType}[/] to filter by.");
+                return AnsiConsole.Ask<string>("");
+
+            case FilterPeriod.Year:
+                AnsiConsole.MarkupLine($"Enter the [darkorange bold]{inputType}[/] to filter by.");
+                return AnsiConsole.Ask<string>("");
+
+            default:
+                return "Invalid";
+        }        
+    }
     internal void ShowInvalidDurationMessage()
     {
         Console.Clear();
@@ -126,4 +152,17 @@ internal class RecordUI
         }
         return false;
     }    
+    internal (FilterPeriod filterPeriodOut, FilterType filterTypeOut) GetFilterChoice()
+    {
+        return (
+            AnsiConsole.Prompt(new SelectionPrompt<FilterPeriod>()
+            .Title("\nSelect the period to filter")
+            .AddChoices(Enum.GetValues<FilterPeriod>())),
+
+            AnsiConsole.Prompt(new SelectionPrompt<FilterType>()
+            .Title("\nSelect the type to filter")
+            .AddChoices(Enum.GetValues<FilterType>()))
+            );
+    }
+  
 }

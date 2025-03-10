@@ -19,7 +19,7 @@ internal class Enums
         Both
     };
 
-    internal enum FilterTypes
+    internal enum FilterPeriod
     {
         Day,
         Week,
@@ -27,11 +27,18 @@ internal class Enums
         Year
     }
 
+    internal enum FilterType
+    {
+        AllAfterIncluding,
+        AllBeforeIncluding,
+        AllBetweenIncluding
+    };
+
     internal enum AscendingType
     {
         Id,
         StartTime,
         EndTime,
         Duration
-    }
+    };
 }

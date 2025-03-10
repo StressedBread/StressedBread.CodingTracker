@@ -91,36 +91,36 @@ internal class CodingController
     }
 
     //TODO: Implement filters
-    internal List<CodingSession> FilteredRecordsQuery(FilterTypes filterType, string? startDateTime, string? endDateTime, bool isAscending = true, AscendingType ascendingType = AscendingType.Id)
+    internal List<CodingSession> FilteredRecordsQuery(FilterPeriod filterPeriod, FilterType filterType, string? startDateTime, string? endDateTime, bool isAscending = true, AscendingType ascendingType = AscendingType.Id)
     {
         DynamicParameters parameters = new();
         string query = "SELECT * FROM CodingTracker WHERE 1=1";
 
-        Dictionary<FilterTypes, string> filterTypes = new()
+        Dictionary<FilterPeriod, string> filterPeriodDict = new()
         {
-            { FilterTypes.Day, "DATE(StartTime)" },
-            { FilterTypes.Week, "STRFTIME('%Y-%W', StartTime)" },
-            { FilterTypes.Month, "STRFTIME('%Y-%m', StartTime)" },
-            { FilterTypes.Year, "STRFTIME('%Y', StartTime)" }
+            { FilterPeriod.Day, "DATE(StartTime)" },
+            { FilterPeriod.Week, "STRFTIME('%Y-%W', StartTime)" },
+            { FilterPeriod.Month, "STRFTIME('%Y-%m', StartTime)" },
+            { FilterPeriod.Year, "STRFTIME('%Y', StartTime)" }
         };
 
-        if (filterTypes.TryGetValue(filterType, out string? filter))
+        if (filterPeriodDict.TryGetValue(filterPeriod, out string? filter))
         {
-            if (!string.IsNullOrEmpty(startDateTime))
+            switch (filterType)
             {
-                query += $" AND {filter} >= @startDateTime";
-                parameters.Add("@startDateTime", startDateTime);
-            }
-            else if (!string.IsNullOrEmpty(endDateTime))
-            {
-                query += $" AND {filter} <= @endDateTime";
-                parameters.Add("@endDateTime", endDateTime);
-            }
-            else if (!string.IsNullOrEmpty(startDateTime) && !string.IsNullOrEmpty(endDateTime))
-            {
-                query += $" AND {filter} BETWEEN @startDateTime AND @endDateTime";
-                parameters.Add("@startDateTime", startDateTime);
-                parameters.Add("@endDateTime", endDateTime);
+                case FilterType.AllAfterIncluding:
+                    query += $" AND {filter} >= @startDateTime";
+                    parameters.Add("@startDateTime", startDateTime);
+                    break;
+                case FilterType.AllBeforeIncluding:
+                    query += $" AND {filter} <= @endDateTime";
+                    parameters.Add("@endDateTime", endDateTime);
+                    break;
+                case FilterType.AllBetweenIncluding:
+                    query += $" AND {filter} BETWEEN @startDateTime AND @endDateTime";
+                    parameters.Add("@startDateTime", startDateTime);
+                    parameters.Add("@endDateTime", endDateTime);
+                    break;
             }
         }
 

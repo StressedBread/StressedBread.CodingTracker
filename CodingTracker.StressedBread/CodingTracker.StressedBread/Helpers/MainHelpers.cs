@@ -1,20 +1,13 @@
 ﻿using CodingTracker.StressedBread.Model;
 using Spectre.Console;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.Helpers;
 
 class MainHelpers
-{
-    Validation validation = new();
-
-    internal DateTime GetInput(string inputType)
-    {
-        AnsiConsole.MarkupLine($"Enter the new [darkorange]{inputType}[/] date and time of the coding session in the format:\n[darkorange bold]Day(s)/Month(s)/Year Hour(s):Minute(s) (24-hour format)[/]");
-        string newTime = AnsiConsole.Ask<string>("");
-        return validation.DateTimeValidation(newTime);
-    }
+{    
     internal void CloseApplication()
     {
         Environment.Exit(0);
