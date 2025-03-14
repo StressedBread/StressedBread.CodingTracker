@@ -12,7 +12,7 @@ internal class RecordUI
     CodingController codingController = new();
     MainHelpers mainHelpers = new();
 
-    internal bool DisplayData(List<CodingSession> records, bool filtered, bool order = false)
+    internal bool DisplayData(List<CodingSession> records, bool filtered, bool notOrder = true)
     {
         Console.Clear();
         Table table = new();
@@ -50,7 +50,7 @@ internal class RecordUI
 
         if (!filtered)
             return ConfirmationPrompt("Do you wish to filter?");
-        if (order)
+        if (!notOrder)
             return ConfirmationPrompt("Do you wish to order the results?");
 
         return false;
@@ -183,5 +183,27 @@ internal class RecordUI
                 true => "Ascending",
                 false => "Descending"
             }));
+    }
+    internal void DisplayReport(TimeSpan sumDuration, TimeSpan sumLastWeekDuration, TimeSpan sumLastYearDuration, TimeSpan avgDuration, 
+        TimeSpan avgLastWeekDuration, TimeSpan avgLastYearDuration, TimeSpan weeklyGoal)
+    {
+        AnsiConsole.MarkupLine($"In total, you have coded for: [darkorange bold]{sumDuration.Days} days, {sumDuration.Hours} hours, " +
+            $"{sumDuration.Minutes} minutes, {sumDuration.Seconds} seconds[/]");
+        AnsiConsole.MarkupLine($"In the last week, you have coded for: [darkorange bold]{sumLastWeekDuration.Days} days, {sumLastWeekDuration.Hours} hours, " +
+            $"{sumLastWeekDuration.Minutes} minutes, {sumLastWeekDuration.Seconds} seconds[/]");
+        AnsiConsole.MarkupLine($"In this year, you have coded for: [darkorange bold]{sumLastYearDuration.Days} days, {sumLastYearDuration.Hours} hours, " +
+            $"{sumLastYearDuration.Minutes} minutes, {sumLastYearDuration.Seconds} seconds[/]\n");
+
+        AnsiConsole.MarkupLine($"On average, you have coded for: [darkorange bold]{avgDuration.Days} days, {avgDuration.Hours} hours, " +
+            $"{avgDuration.Minutes} minutes, {avgDuration.Seconds} seconds[/]");
+        AnsiConsole.MarkupLine($"On average in the last week, you have coded: [darkorange bold]{avgLastWeekDuration.Days} days, {avgLastWeekDuration.Hours} hours, " +
+            $"{avgLastWeekDuration.Minutes} minutes, {avgLastWeekDuration.Seconds} seconds[/]");
+        AnsiConsole.MarkupLine($"On average in this year, you have coded for: [darkorange bold]{avgLastYearDuration.Days} days, {avgLastYearDuration.Hours} hours, " +
+            $"{avgLastYearDuration.Minutes} minutes, {avgLastYearDuration.Seconds} seconds[/]");
+    }
+    internal int GetWeeklyGoal()
+    {
+        AnsiConsole.MarkupLine($"Enter new weekly coding goal in [darkorange]hours.[/]");
+        return AnsiConsole.Ask<int>("");
     }
 }

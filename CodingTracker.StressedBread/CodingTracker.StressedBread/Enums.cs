@@ -9,6 +9,8 @@ internal class Enums
         EditRecord,
         DeleteRecord,
         CodingSession,
+        Report,
+        Goal,
         CloseApplication
     };
 

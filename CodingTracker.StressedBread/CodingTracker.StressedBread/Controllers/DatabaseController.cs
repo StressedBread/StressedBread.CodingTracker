@@ -26,4 +26,37 @@ internal class DatabaseController
             return connection.Query<CodingSession>(query, parameters).ToList();
         }
     }
+
+    internal int SumDurationReader(string query)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            return connection.QuerySingleOrDefault<int?>(query) ?? 0;
+        }
+    }
+    internal double AvgDurationReader(string query)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            return connection.QuerySingleOrDefault<double?>(query) ?? 0;
+        }
+    }
+    internal string? TriggerExists(string query)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            return connection.QuerySingleOrDefault<string?>(query) ?? null;
+        }
+    }
+    internal int WeeklyGoalReader(string query)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            return connection.QuerySingleOrDefault<int?>(query) ?? 0;
+        }
+    }
 }

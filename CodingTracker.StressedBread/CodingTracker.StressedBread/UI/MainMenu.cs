@@ -42,6 +42,14 @@ internal class MainMenu
                     stopWatchSession.StartSession();
                     break;
 
+                case MenuChoice.Report:
+                    recordHelper.ReportHelper();
+                    break;
+
+                case MenuChoice.Goal:
+                    recordHelper.GoalHelper();
+                    break;
+
                 case MenuChoice.CloseApplication:
                     mainHelpers.CloseApplication();
                     break;

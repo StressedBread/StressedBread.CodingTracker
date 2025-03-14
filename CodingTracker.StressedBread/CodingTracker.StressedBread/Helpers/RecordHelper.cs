@@ -159,14 +159,38 @@ internal class RecordHelper
 
         var records = codingController.FilteredRecordsQuery(filterPeriodOut, filterTypeOut, startTemp, endTemp);
 
-        if (recordUI.DisplayData(records, true, true))
+        if (recordUI.DisplayData(records, true, false))
         {
             ascendingTypeOut = recordUI.FilterOrder();
             isAscending = recordUI.IsAscending();
             records = codingController.FilteredRecordsQuery(filterPeriodOut, filterTypeOut, startTemp, endTemp, isAscending, ascendingTypeOut);
-            recordUI.DisplayData(records, true, false);
+            recordUI.DisplayData(records, true, true);
         }
 
         Console.ReadKey();
+    }
+    internal void ReportHelper()
+    {
+        var sumRecords = codingController.SumDurationQuery();
+        var avgRecords = codingController.AvgDurationQuery();
+        int weeklyGoal = codingController.ViewGoal();
+
+        TimeSpan sum = TimeSpan.FromSeconds(sumRecords.sumDurationOut);
+        TimeSpan sumLastWeek = TimeSpan.FromSeconds(sumRecords.lastWeekDuration);
+        TimeSpan sumLastYear = TimeSpan.FromSeconds(sumRecords.lastYearDuration);
+
+        TimeSpan avg = TimeSpan.FromSeconds(avgRecords.avgDurationOut);
+        TimeSpan avgLastWeek = TimeSpan.FromSeconds(avgRecords.lastWeekDuration);
+        TimeSpan avgLastYear = TimeSpan.FromSeconds(avgRecords.lastYearDuration);
+
+        TimeSpan weeklyGoalSpan = TimeSpan.FromHours(weeklyGoal);
+
+        recordUI.DisplayReport(sum, sumLastWeek, sumLastYear, avg, avgLastWeek, avgLastYear, weeklyGoalSpan);
+        Console.ReadKey();
+    }
+    internal void GoalHelper()
+    {
+        int weeklyGoal = recordUI.GetWeeklyGoal();
+        codingController.UpdateGoalQuery(weeklyGoal);
     }
 }
