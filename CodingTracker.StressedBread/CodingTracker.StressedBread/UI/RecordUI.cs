@@ -12,8 +12,9 @@ internal class RecordUI
     CodingController codingController = new();
     MainHelpers mainHelpers = new();
 
-    internal bool DisplayData(List<CodingSession> records, bool filtered)
+    internal bool DisplayData(List<CodingSession> records, bool filtered, bool order = false)
     {
+        Console.Clear();
         Table table = new();
 
         table.AddColumn("Id");
@@ -49,6 +50,8 @@ internal class RecordUI
 
         if (!filtered)
             return ConfirmationPrompt("Do you wish to filter?");
+        if (order)
+            return ConfirmationPrompt("Do you wish to order the results?");
 
         return false;
     }
@@ -164,5 +167,21 @@ internal class RecordUI
             .AddChoices(Enum.GetValues<FilterType>()))
             );
     }
-  
+    internal AscendingType FilterOrder()
+    {
+        return AnsiConsole.Prompt(new SelectionPrompt<AscendingType>()
+            .Title("Choose the column to order by.")
+            .AddChoices(Enum.GetValues<AscendingType>()));
+    }
+    internal bool IsAscending()
+    {
+        return AnsiConsole.Prompt(new SelectionPrompt<bool>()
+            .Title("Choose the ascension to order by.")
+            .AddChoices(true, false)
+            .UseConverter(x => x switch
+            {
+                true => "Ascending",
+                false => "Descending"
+            }));
+    }
 }

@@ -32,37 +32,22 @@ internal class Validation
             "dd/M/yyyy",
             "d/MM/yyyy"
         };
-        string[] formattedFilterMonth =
-        {
-            "MM/yyyy",
-            "M/yyyy"
-        };
-        string[] formattedFilterYear =
-        {
-            "yyyy"
-        };
 
         bool isWeek = false;
 
         DateTime date;
         
-        //I need to output the checked input as string and I need to implement proper checking and formatting of week filter
-
         switch (filterPeriod)
         {
             case FilterPeriod.Day:
                 format = formattedFilterDay;
                 break;
-            case FilterPeriod.Week:
-                isWeek = true;
-                format = [];
-                break;
             case FilterPeriod.Month:
-                format = formattedFilterMonth;
+                format = formattedFilterDay;
                 time = $"01/{time}";
                 break;
             case FilterPeriod.Year:
-                format = formattedFilterYear;
+                format = formattedFilterDay;
                 time = $"01/01/{time}";
                 break;
             default:
@@ -75,14 +60,22 @@ internal class Validation
             {
                 AnsiConsole.MarkupLine("[red]Invalid input. Please try again.[/]");
                 time = AnsiConsole.Ask<string>("");
-            }
+                switch (filterPeriod)
+                {
+                    case FilterPeriod.Month:
+                        time = $"01/{time}";
+                        break;
+                    case FilterPeriod.Year:
+                        time = $"01/01/{time}";
+                        break;
+                }
+            }            
         }
         return date = DateTime.ParseExact(time, format, CultureInfo.InvariantCulture);
-
     }
-    internal void ValidateWeekAndYear(string input)
+    internal string ValidateWeekAndYear(string input)
     {
-        string weekPattern = @"^([1-9]|[1-4][0-9]|5[0-3])/\b((19|20)\d{2})\b";
+        string weekPattern = @"^(0[0-9]|[1-4][0-9]|5[0-3])/\b((19|20)\d{2})\b";
 
         Match match = Regex.Match(input, weekPattern);
 
@@ -90,7 +83,10 @@ internal class Validation
         {
             AnsiConsole.MarkupLine("[red]Invalid input. Please try again.[/]");
             input = AnsiConsole.Ask<string>("");
-        }
+            match = Regex.Match(input, weekPattern);
+        }      
+
+        return input; 
     }
     internal bool DurationValidation(int duration)
     {

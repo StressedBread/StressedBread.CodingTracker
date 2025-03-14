@@ -97,8 +97,11 @@ internal class RecordHelper
     {
         FilterPeriod filterPeriodOut;
         FilterType filterTypeOut;
+        AscendingType ascendingTypeOut;
+        bool isAscending;
         string? startTemp = "", endTemp = "", startLabel = "", endLabel = "";
-        DateTime startTime, endTime;
+        DateTime startTime = DateTime.MinValue;
+        DateTime endTime = DateTime.MinValue;
 
         (filterPeriodOut, filterTypeOut) = recordUI.GetFilterChoice();
 
@@ -109,16 +112,16 @@ internal class RecordHelper
                 endLabel = "end";
                 break;
             case FilterPeriod.Week:
-                startLabel = "Week(s)/Year";
-                endLabel = "Week(s)/Year";
+                startLabel = "Start Week(s)/Year";
+                endLabel = "End Week(s)/Year";
                 break;
             case FilterPeriod.Month:
-                startLabel = "Month(s)/Year";
-                endLabel = "Month(s)/Year";
+                startLabel = "Start Month(s)/Year";
+                endLabel = "End Month(s)/Year";
                 break;
             case FilterPeriod.Year:
-                startLabel = "Year";
-                endLabel = "Year";
+                startLabel = "Start Year";
+                endLabel = "End Year";
                 break;
         }
 
@@ -128,31 +131,41 @@ internal class RecordHelper
         if (requiresStart) 
         {
             startTemp = recordUI.GetInput($"({startLabel})", filterPeriodOut);
-            startTime = validation.DateTimeValidation(startTemp, filterPeriodOut);
-            startTemp = mainHelpers.FormattedDateTime(startTime);
+            if (filterPeriodOut != FilterPeriod.Week)
+            {
+                startTime = validation.DateTimeValidation(startTemp, filterPeriodOut);
+                startTemp = mainHelpers.FormattedDateTimeFilter(startTime, filterPeriodOut);
+            }
+            else
+            {
+                startTemp = validation.ValidateWeekAndYear(startTemp);
+                startTemp = mainHelpers.FormattedDateTimeFilter(startTime, filterPeriodOut, startTemp);
+            }
         }
         if (requiresEnd) 
         {
             endTemp = recordUI.GetInput($"({endLabel})", filterPeriodOut);
-            endTime = validation.DateTimeValidation(endTemp, filterPeriodOut);
-            endTemp = mainHelpers.FormattedDateTime(endTime);
+            if (filterPeriodOut != FilterPeriod.Week)
+            {
+                endTime = validation.DateTimeValidation(endTemp, filterPeriodOut);
+                endTemp = mainHelpers.FormattedDateTimeFilter(endTime, filterPeriodOut);
+            }
+            else
+            {
+                endTemp = validation.ValidateWeekAndYear(endTemp);
+                endTemp = mainHelpers.FormattedDateTimeFilter(endTime, filterPeriodOut,endTemp);
+            }
         } 
 
-        codingController.FilteredRecordsQuery(filterPeriodOut, filterTypeOut, startTemp, endTemp);
+        var records = codingController.FilteredRecordsQuery(filterPeriodOut, filterTypeOut, startTemp, endTemp);
 
-        /*switch ((filterPeriodOut, filterTypeOut))
+        if (recordUI.DisplayData(records, true, true))
         {
-            case (FilterPeriod.Day, FilterType.AllAfterIncluding):
-                startTemp = recordUI.GetInput("start");                
-                break;
-            case (FilterPeriod.Day, FilterType.AllBeforeIncluding):
-                endTemp = recordUI.GetInput("end");
-                break;
-            case (FilterPeriod.Day, FilterType.AllBetweenIncluding):
-                startTemp = recordUI.GetInput("start");
-                endTemp = recordUI.GetInput("end");
-                break;
-        }*/
+            ascendingTypeOut = recordUI.FilterOrder();
+            isAscending = recordUI.IsAscending();
+            records = codingController.FilteredRecordsQuery(filterPeriodOut, filterTypeOut, startTemp, endTemp, isAscending, ascendingTypeOut);
+            recordUI.DisplayData(records, true, false);
+        }
 
         Console.ReadKey();
     }
