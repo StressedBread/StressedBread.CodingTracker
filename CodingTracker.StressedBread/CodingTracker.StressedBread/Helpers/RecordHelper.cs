@@ -34,6 +34,7 @@ internal class RecordHelper
 
         CodingSession newSession = new(startDateTimeOut.ToString(), endDateTimeOut.ToString(), durationOut);
         codingController.AddRecordQuery(newSession);
+        codingController.GoalDurationQuery();
     }
     internal void EditRecordHelper()
     {
@@ -79,6 +80,7 @@ internal class RecordHelper
 
         CodingSession codingSession = new(recordToEdit.Id, startDateTimeOut, endDateTimeOut, durationOut);
         codingController.EditRecordQuery(codingSession);
+        codingController.GoalDurationQuery();
 
         recordUI.ShowSuccessMessage("updated");
     }
@@ -89,6 +91,7 @@ internal class RecordHelper
         if (recordUI.ConfirmationPrompt("Are you sure?"))
         {
             codingController.DeleteRecordQuery(recordToDelete.Id);
+            codingController.GoalDurationQuery();
             recordUI.ShowSuccessMessage("deleted");
         }
 
@@ -173,19 +176,12 @@ internal class RecordHelper
     {
         var sumRecords = codingController.SumDurationQuery();
         var avgRecords = codingController.AvgDurationQuery();
-        int weeklyGoal = codingController.ViewGoal();
+        var weeklyGoal = codingController.ViewGoalQuery();
+        var daysToMonday = codingController.GetDaysLeftToMonday();
 
-        TimeSpan sum = TimeSpan.FromSeconds(sumRecords.sumDurationOut);
-        TimeSpan sumLastWeek = TimeSpan.FromSeconds(sumRecords.lastWeekDuration);
-        TimeSpan sumLastYear = TimeSpan.FromSeconds(sumRecords.lastYearDuration);
+        var timePerDay =  mainHelpers.CalculateCodingPerDay(daysToMonday, weeklyGoal.TimeLeft);
 
-        TimeSpan avg = TimeSpan.FromSeconds(avgRecords.avgDurationOut);
-        TimeSpan avgLastWeek = TimeSpan.FromSeconds(avgRecords.lastWeekDuration);
-        TimeSpan avgLastYear = TimeSpan.FromSeconds(avgRecords.lastYearDuration);
-
-        TimeSpan weeklyGoalSpan = TimeSpan.FromHours(weeklyGoal);
-
-        recordUI.DisplayReport(sum, sumLastWeek, sumLastYear, avg, avgLastWeek, avgLastYear, weeklyGoalSpan);
+        recordUI.DisplayReport(sumRecords, avgRecords, weeklyGoal, timePerDay);
         Console.ReadKey();
     }
     internal void GoalHelper()

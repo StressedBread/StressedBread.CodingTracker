@@ -46,7 +46,7 @@ internal class MainMenu
                     recordHelper.ReportHelper();
                     break;
 
-                case MenuChoice.Goal:
+                case MenuChoice.SetGoal:
                     recordHelper.GoalHelper();
                     break;
 

@@ -40,6 +40,7 @@ internal class StopWatchSession
 
         CodingSession codingSession = new(startFormattedTime, endFormattedTime, durationOut);
         codingController.AddRecordQuery(codingSession);
+        codingController.GoalDurationQuery();
     }
     internal string GetFormattedElapsedTime()
     {

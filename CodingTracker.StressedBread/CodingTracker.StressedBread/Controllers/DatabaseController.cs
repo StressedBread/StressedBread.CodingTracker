@@ -27,12 +27,12 @@ internal class DatabaseController
         }
     }
 
-    internal int SumDurationReader(string query)
+    internal double SumDurationReader(string query)
     {
         using (var connection = new SqliteConnection(connectionString))
         {
             connection.Open();
-            return connection.QuerySingleOrDefault<int?>(query) ?? 0;
+            return connection.QuerySingleOrDefault<double?>(query) ?? 0;
         }
     }
     internal double AvgDurationReader(string query)
@@ -51,12 +51,26 @@ internal class DatabaseController
             return connection.QuerySingleOrDefault<string?>(query) ?? null;
         }
     }
-    internal int WeeklyGoalReader(string query)
+    internal WeeklyGoalStatistics WeeklyGoalReader(string query)
     {
         using (var connection = new SqliteConnection(connectionString))
         {
             connection.Open();
-            return connection.QuerySingleOrDefault<int?>(query) ?? 0;
+            var result = connection.QueryFirst(query);
+
+            double goalInHours = result.goal;
+            double timeLeftInSeconds = result.timeLeft;
+            double timeCodedInSeconds = result.timeCoded;
+
+            return new(goalInHours, timeLeftInSeconds, timeCodedInSeconds);
+        }
+    }
+    internal double DaysToMonday(string query)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            return connection.QueryFirst<double>(query);            
         }
     }
 }

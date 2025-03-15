@@ -1,5 +1,6 @@
 ﻿using CodingTracker.StressedBread.Model;
 using Dapper;
+using Spectre.Console;
 using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.Controllers;
@@ -19,7 +20,8 @@ internal class CodingController
 
         var queryGoalTable = @"CREATE TABLE IF NOT EXISTS CodingGoal (
                                 WeeklyCodingGoal INTEGER UNIQUE,
-                                LeftCodingTime STRING UNIQUE)";
+                                LeftCodingTime INTEGER UNIQUE,
+                                CodedThisWeek INTEGER UNIQUE)";
 
         var queryTrigger = @"CREATE TRIGGER EnforceSingleRow
                             BEFORE INSERT ON CodingGoal
@@ -29,8 +31,8 @@ internal class CodingController
                             END;";
 
         var queryTriggerExists = @"SELECT name FROM sqlite_master WHERE type='trigger' AND name='EnforceSingleRow'";
-        var queryInsertFirstRow = @"INSERT INTO CodingGoal (WeeklyCodingGoal)
-                                    SELECT 0 WHERE NOT EXISTS (SELECT 1 FROM CodingGoal)";
+        var queryInsertFirstRow = @"INSERT INTO CodingGoal (WeeklyCodingGoal, LeftCodingTime, CodedThisWeek)
+                                    SELECT 0, 0, 0 WHERE NOT EXISTS (SELECT 1 FROM CodingGoal)";
 
         var triggerExists = databaseController.TriggerExists(queryTriggerExists);       
 
@@ -41,14 +43,12 @@ internal class CodingController
         databaseController.Execute(queryInsertFirstRow);
         if (string.IsNullOrEmpty(triggerExists)) databaseController.Execute(queryTrigger);
     }
-
     internal List<CodingSession> ViewRecordsQuery()
     {
         var query = @"
             SELECT * FROM CodingTracker";
         return databaseController.Reader(query);
     }
-
     internal void AddRecordQuery(CodingSession session)
     {
         var query = @"
@@ -63,7 +63,6 @@ internal class CodingController
 
         databaseController.Execute(query, parameters);
     }
-
     internal void EditRecordQuery(CodingSession session)
     {
         DynamicParameters parameters = new();
@@ -149,25 +148,26 @@ internal class CodingController
 
         return databaseController.Reader(query, parameters);
     }
-    internal (int sumDurationOut, int lastWeekDuration, int lastYearDuration) SumDurationQuery()
+    internal CodingStatistics SumDurationQuery()
     {
         string sumDurationQuery = @"SELECT SUM(Duration) FROM CodingTracker";
 
-        string lastWeekDurationQuery = @"SELECT SUM(Duration) FROM CodingTracker 
-                                    WHERE StartTime 
-                                    BETWEEN datetime('now', '-6 days') AND datetime('now', 'localtime')";
+        string lastWeekDurationQuery = @"SELECT SUM(Duration) 
+                                        FROM CodingTracker
+                                        WHERE strftime('%Y', StartTime) = strftime('%Y', 'now', 'weekday 0', '-6 days')
+                                        AND strftime('%W', StartTime) = strftime('%W', 'now', 'weekday 0', '-6 days')";
 
         string lastYearDurationQuery = @"SELECT SUM(Duration) FROM CodingTracker 
                                     WHERE StartTime 
                                     BETWEEN datetime('now', 'start of year') AND datetime('now', 'localtime')";
 
-        int sumDuration = databaseController.SumDurationReader(sumDurationQuery);
-        int lastWeekDuration = databaseController.SumDurationReader(lastWeekDurationQuery);
-        int lastYearDuration = databaseController.SumDurationReader(lastYearDurationQuery);
+        double sumDuration = databaseController.SumDurationReader(sumDurationQuery);
+        double lastWeekDuration = databaseController.SumDurationReader(lastWeekDurationQuery);
+        double lastYearDuration = databaseController.SumDurationReader(lastYearDurationQuery);
 
-        return (sumDuration, lastWeekDuration, lastYearDuration);
+        return new(sumDuration, lastWeekDuration, lastYearDuration);
     }
-    internal (double avgDurationOut, double lastWeekDuration, double lastYearDuration) AvgDurationQuery()
+    internal CodingStatistics AvgDurationQuery()
     {
         string avgDurationQuery = @"SELECT AVG(Duration) FROM CodingTracker";
 
@@ -183,7 +183,7 @@ internal class CodingController
         double lastWeekDuration = databaseController.AvgDurationReader(lastWeekDurationQuery);
         double lastYearDuration = databaseController.AvgDurationReader(lastYearDurationQuery);
 
-        return (avgDuration, lastWeekDuration, lastYearDuration);
+        return new(avgDuration, lastWeekDuration, lastYearDuration);
     }
     internal void UpdateGoalQuery(int hours)
     {
@@ -193,11 +193,65 @@ internal class CodingController
                       WHERE ROWID = 1";
         parameters.Add("@weeklyGoal", hours);
 
-        databaseController.Execute(query);
+        databaseController.Execute(query, parameters);
+
+        GoalDurationQuery();
     }
-    internal int ViewGoal()
+    internal WeeklyGoalStatistics ViewGoalQuery()
     {
-        var query = @"Select WeeklyCodingGoal FROM CodingGoal";
+        var query = @"SELECT 
+                    WeeklyCodingGoal AS goal, 
+                    LeftCodingTime AS timeLeft, 
+                    CodedThisWeek AS timeCoded
+                    FROM CodingGoal";
         return databaseController.WeeklyGoalReader(query);
+    }
+    internal double GetDaysLeftToMonday()
+    {
+        var query = @"SELECT (strftime('%s', date('now', 'weekday 0', '+1 days')) 
+                    - strftime('%s', date('now', 'start of day')))
+                    / 86400";
+        return databaseController.DaysToMonday(query);
+    }
+    internal void GoalDurationQuery()
+    {
+        DynamicParameters parameters = new();
+
+        string lastWeekDurationQuery = @"SELECT SUM(Duration) 
+                                        FROM CodingTracker
+                                        WHERE strftime('%Y', StartTime) = strftime('%Y', 'now', 'weekday 0', '-6 days')
+                                        AND strftime('%W', StartTime) = strftime('%W', 'now', 'weekday 0', '-6 days')";
+
+        var query = @"SELECT 
+                    WeeklyCodingGoal AS goal, 
+                    LeftCodingTime AS timeLeft, 
+                    CodedThisWeek AS timeCoded
+                    FROM CodingGoal";
+        var goalStats = databaseController.WeeklyGoalReader(query);
+
+        double goal = goalStats.Goal.TotalSeconds;
+
+        double lastWeekDuration = databaseController.SumDurationReader(lastWeekDurationQuery);
+
+        var updateQuery = @"UPDATE CodingGoal 
+                      SET CodedThisWeek = @duration
+                      WHERE ROWID = 1";
+        parameters.Add("@duration", lastWeekDuration);
+
+        double result = goal - lastWeekDuration;
+        if (result < 0) result = 0;
+        SetTimeLeftQuery(result);
+
+        databaseController.Execute(updateQuery, parameters);
+    }
+    internal void SetTimeLeftQuery(double timeLeft)
+    {
+        DynamicParameters parameters = new();
+        var updateQuery = @"UPDATE CodingGoal 
+                      SET LeftCodingTime = @duration
+                      WHERE ROWID = 1";
+        parameters.Add("@duration", timeLeft);
+
+        databaseController.Execute(updateQuery, parameters);
     }
 }

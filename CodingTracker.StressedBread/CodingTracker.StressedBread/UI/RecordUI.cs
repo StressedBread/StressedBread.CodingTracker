@@ -184,26 +184,36 @@ internal class RecordUI
                 false => "Descending"
             }));
     }
-    internal void DisplayReport(TimeSpan sumDuration, TimeSpan sumLastWeekDuration, TimeSpan sumLastYearDuration, TimeSpan avgDuration, 
-        TimeSpan avgLastWeekDuration, TimeSpan avgLastYearDuration, TimeSpan weeklyGoal)
+    internal void DisplayReport(CodingStatistics sumStats, CodingStatistics avgStats, WeeklyGoalStatistics weeklyGoalStats, TimeSpan timePerDay)
     {
-        AnsiConsole.MarkupLine($"In total, you have coded for: [darkorange bold]{sumDuration.Days} days, {sumDuration.Hours} hours, " +
-            $"{sumDuration.Minutes} minutes, {sumDuration.Seconds} seconds[/]");
-        AnsiConsole.MarkupLine($"In the last week, you have coded for: [darkorange bold]{sumLastWeekDuration.Days} days, {sumLastWeekDuration.Hours} hours, " +
-            $"{sumLastWeekDuration.Minutes} minutes, {sumLastWeekDuration.Seconds} seconds[/]");
-        AnsiConsole.MarkupLine($"In this year, you have coded for: [darkorange bold]{sumLastYearDuration.Days} days, {sumLastYearDuration.Hours} hours, " +
-            $"{sumLastYearDuration.Minutes} minutes, {sumLastYearDuration.Seconds} seconds[/]\n");
+        AnsiConsole.MarkupLine($"Your total coding time is: [darkorange bold]{sumStats.TotalDuration.Days} days, {sumStats.TotalDuration.Hours} hours, " +
+            $"{sumStats.TotalDuration.Minutes} minutes, {sumStats.TotalDuration.Seconds} seconds[/]");
+        AnsiConsole.MarkupLine($"Your coding time this week is: [darkorange bold]{sumStats.LastWeekDuration.Days} days, {sumStats.LastWeekDuration.Hours} hours, " +
+            $"{sumStats.LastWeekDuration.Minutes} minutes, {sumStats.LastWeekDuration.Seconds} seconds[/]");
+        AnsiConsole.MarkupLine($"Your total coding time this year is: [darkorange bold]{sumStats.LastYearDuration.Days} days, {sumStats.LastYearDuration.Hours} hours, " +
+            $"{sumStats.LastYearDuration.Minutes} minutes, {sumStats.LastYearDuration.Seconds} seconds[/]\n");
 
-        AnsiConsole.MarkupLine($"On average, you have coded for: [darkorange bold]{avgDuration.Days} days, {avgDuration.Hours} hours, " +
-            $"{avgDuration.Minutes} minutes, {avgDuration.Seconds} seconds[/]");
-        AnsiConsole.MarkupLine($"On average in the last week, you have coded: [darkorange bold]{avgLastWeekDuration.Days} days, {avgLastWeekDuration.Hours} hours, " +
-            $"{avgLastWeekDuration.Minutes} minutes, {avgLastWeekDuration.Seconds} seconds[/]");
-        AnsiConsole.MarkupLine($"On average in this year, you have coded for: [darkorange bold]{avgLastYearDuration.Days} days, {avgLastYearDuration.Hours} hours, " +
-            $"{avgLastYearDuration.Minutes} minutes, {avgLastYearDuration.Seconds} seconds[/]");
+        AnsiConsole.MarkupLine($"Your average coding time per session is: [darkorange bold]{avgStats.TotalDuration.Days} days, {avgStats.TotalDuration.Hours} hours, " +
+            $"{avgStats.TotalDuration.Minutes} minutes, {avgStats.TotalDuration.Seconds} seconds[/]");
+        AnsiConsole.MarkupLine($"Your weekly average coding time is: [darkorange bold]{avgStats.LastWeekDuration.Days} days, {avgStats.LastWeekDuration.Hours} hours, " +
+            $"{avgStats.LastWeekDuration.Minutes} minutes, {avgStats.LastWeekDuration.Seconds} seconds[/]");
+        AnsiConsole.MarkupLine($"Your average coding time this year is: [darkorange bold]{avgStats.LastYearDuration.Days} days, {avgStats.LastYearDuration.Hours} hours, " +
+            $"{avgStats.LastYearDuration.Minutes} minutes, {avgStats.LastYearDuration.Seconds} seconds[/]\n");
+
+        AnsiConsole.MarkupLine($"Your weekly coding goal: [darkorange bold]{weeklyGoalStats.TimeCoded} / {weeklyGoalStats.Goal}[/]");
+        AnsiConsole.MarkupLine($"Time left to code to complete the goal: [darkorange bold]{weeklyGoalStats.TimeLeft}[/]\n");
+
+        AnsiConsole.MarkupLine($"You would have to code [darkorange bold]{timePerDay.Hours}:{timePerDay.Minutes}:{timePerDay.Seconds}[/] per day to reach your goal.");
     }
     internal int GetWeeklyGoal()
     {
         AnsiConsole.MarkupLine($"Enter new weekly coding goal in [darkorange]hours.[/]");
-        return AnsiConsole.Ask<int>("");
+        var result = AnsiConsole.Ask<int>("");
+        while (result < 0)
+        {
+            AnsiConsole.MarkupLine($"[red]Goal can't be negative![/]");
+            result = AnsiConsole.Ask<int>("");
+        }
+        return result;
     }
 }

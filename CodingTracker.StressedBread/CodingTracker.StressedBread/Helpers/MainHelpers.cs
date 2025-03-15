@@ -1,13 +1,11 @@
 ﻿using CodingTracker.StressedBread.Model;
-using Spectre.Console;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.Helpers;
 
 class MainHelpers
-{    
+{
     internal void CloseApplication()
     {
         Environment.Exit(0);
@@ -75,5 +73,11 @@ class MainHelpers
         int duration = DurationCalculation(startDateTime, endDateTime);
 
         return (startFormattedTime, endFormattedTime, duration);
+    }
+    internal TimeSpan CalculateCodingPerDay(double daysToMonday, TimeSpan timeLeft)
+    {
+        TimeSpan timeToMonday = TimeSpan.FromDays(daysToMonday);
+        double result = timeLeft/timeToMonday;
+        return TimeSpan.FromDays(result);
     }
 }

@@ -10,7 +10,7 @@ internal class Enums
         DeleteRecord,
         CodingSession,
         Report,
-        Goal,
+        SetGoal,
         CloseApplication
     };
 
