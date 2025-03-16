@@ -17,7 +17,6 @@ internal class DatabaseController
             connection.Execute(query, parameters);
         }
     }
-    
     internal List<CodingSession> Reader(string query, object? parameters = null)
     {
         using (var connection = new SqliteConnection(connectionString))
@@ -26,7 +25,6 @@ internal class DatabaseController
             return connection.Query<CodingSession>(query, parameters).ToList();
         }
     }
-
     internal double SumDurationReader(string query)
     {
         using (var connection = new SqliteConnection(connectionString))

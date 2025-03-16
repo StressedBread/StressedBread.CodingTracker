@@ -157,15 +157,15 @@ internal class CodingController
                                         WHERE strftime('%Y', StartTime) = strftime('%Y', 'now', 'weekday 0', '-6 days')
                                         AND strftime('%W', StartTime) = strftime('%W', 'now', 'weekday 0', '-6 days')";
 
-        string lastYearDurationQuery = @"SELECT SUM(Duration) FROM CodingTracker 
+        string thisYearDurationQuery = @"SELECT SUM(Duration) FROM CodingTracker 
                                     WHERE StartTime 
                                     BETWEEN datetime('now', 'start of year') AND datetime('now', 'localtime')";
 
         double sumDuration = databaseController.SumDurationReader(sumDurationQuery);
         double lastWeekDuration = databaseController.SumDurationReader(lastWeekDurationQuery);
-        double lastYearDuration = databaseController.SumDurationReader(lastYearDurationQuery);
+        double thisYearDuration = databaseController.SumDurationReader(thisYearDurationQuery);
 
-        return new(sumDuration, lastWeekDuration, lastYearDuration);
+        return new(sumDuration, lastWeekDuration, thisYearDuration);
     }
     internal CodingStatistics AvgDurationQuery()
     {
@@ -175,15 +175,15 @@ internal class CodingController
                                     WHERE StartTime 
                                     BETWEEN datetime('now', '-6 days') AND datetime('now', 'localtime')";
 
-        string lastYearDurationQuery = @"SELECT AVG(Duration) FROM CodingTracker 
+        string thisYearDurationQuery = @"SELECT AVG(Duration) FROM CodingTracker 
                                     WHERE StartTime 
                                     BETWEEN datetime('now', 'start of year') AND datetime('now', 'localtime')";
 
         double avgDuration = databaseController.AvgDurationReader(avgDurationQuery);
         double lastWeekDuration = databaseController.AvgDurationReader(lastWeekDurationQuery);
-        double lastYearDuration = databaseController.AvgDurationReader(lastYearDurationQuery);
+        double thisYearDuration = databaseController.AvgDurationReader(thisYearDurationQuery);
 
-        return new(avgDuration, lastWeekDuration, lastYearDuration);
+        return new(avgDuration, lastWeekDuration, thisYearDuration);
     }
     internal void UpdateGoalQuery(int hours)
     {

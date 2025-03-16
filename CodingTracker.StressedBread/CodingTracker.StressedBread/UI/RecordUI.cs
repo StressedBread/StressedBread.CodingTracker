@@ -7,10 +7,14 @@ using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.UI;
 
+/// <summary>
+/// Handles all the UI for displaying data, reports and goal. Also handles the UI side of user input. 
+/// </summary>
 internal class RecordUI
 {
     CodingController codingController = new();
     MainHelpers mainHelpers = new();
+    StringFormatting stringFormatting = new();
 
     internal bool DisplayData(List<CodingSession> records, bool filtered, bool notOrder = true)
     {
@@ -42,7 +46,7 @@ internal class RecordUI
                 formattedStartTime.Substring(11, 8),
                 formattedEndTime.Substring(0, 10),
                 formattedEndTime.Substring(11, 8),
-                mainHelpers.FormattedDuration(record.Duration)
+                stringFormatting.FormattedDuration(record.Duration)
                 );
         }
 
@@ -72,7 +76,7 @@ internal class RecordUI
 
                 return $"| {DateTime.Parse(r.StartTime).ToString(format),-18} " +
                         $"| {DateTime.Parse(r.EndTime).ToString(format),-18} " +
-                        $"| {mainHelpers.FormattedDuration(r.Duration),-11} |";
+                        $"| {stringFormatting.FormattedDuration(r.Duration),-11} |";
             })
             .AddChoices(records));
     }
@@ -155,9 +159,9 @@ internal class RecordUI
         }
         return false;
     }    
-    internal (FilterPeriod filterPeriodOut, FilterType filterTypeOut) GetFilterChoice()
+    internal FilterChoice GetFilterChoice()
     {
-        return (
+        return new(
             AnsiConsole.Prompt(new SelectionPrompt<FilterPeriod>()
             .Title("\nSelect the period to filter")
             .AddChoices(Enum.GetValues<FilterPeriod>())),
@@ -190,15 +194,15 @@ internal class RecordUI
             $"{sumStats.TotalDuration.Minutes} minutes, {sumStats.TotalDuration.Seconds} seconds[/]");
         AnsiConsole.MarkupLine($"Your coding time this week is: [darkorange bold]{sumStats.LastWeekDuration.Days} days, {sumStats.LastWeekDuration.Hours} hours, " +
             $"{sumStats.LastWeekDuration.Minutes} minutes, {sumStats.LastWeekDuration.Seconds} seconds[/]");
-        AnsiConsole.MarkupLine($"Your total coding time this year is: [darkorange bold]{sumStats.LastYearDuration.Days} days, {sumStats.LastYearDuration.Hours} hours, " +
-            $"{sumStats.LastYearDuration.Minutes} minutes, {sumStats.LastYearDuration.Seconds} seconds[/]\n");
+        AnsiConsole.MarkupLine($"Your total coding time this year is: [darkorange bold]{sumStats.ThisYearDuration.Days} days, {sumStats.ThisYearDuration.Hours} hours, " +
+            $"{sumStats.ThisYearDuration.Minutes} minutes, {sumStats.ThisYearDuration.Seconds} seconds[/]\n");
 
         AnsiConsole.MarkupLine($"Your average coding time per session is: [darkorange bold]{avgStats.TotalDuration.Days} days, {avgStats.TotalDuration.Hours} hours, " +
             $"{avgStats.TotalDuration.Minutes} minutes, {avgStats.TotalDuration.Seconds} seconds[/]");
         AnsiConsole.MarkupLine($"Your weekly average coding time is: [darkorange bold]{avgStats.LastWeekDuration.Days} days, {avgStats.LastWeekDuration.Hours} hours, " +
             $"{avgStats.LastWeekDuration.Minutes} minutes, {avgStats.LastWeekDuration.Seconds} seconds[/]");
-        AnsiConsole.MarkupLine($"Your average coding time this year is: [darkorange bold]{avgStats.LastYearDuration.Days} days, {avgStats.LastYearDuration.Hours} hours, " +
-            $"{avgStats.LastYearDuration.Minutes} minutes, {avgStats.LastYearDuration.Seconds} seconds[/]\n");
+        AnsiConsole.MarkupLine($"Your average coding time this year is: [darkorange bold]{avgStats.ThisYearDuration.Days} days, {avgStats.ThisYearDuration.Hours} hours, " +
+            $"{avgStats.ThisYearDuration.Minutes} minutes, {avgStats.ThisYearDuration.Seconds} seconds[/]\n");
 
         AnsiConsole.MarkupLine($"Your weekly coding goal: [darkorange bold]{weeklyGoalStats.TimeCoded} / {weeklyGoalStats.Goal}[/]");
         AnsiConsole.MarkupLine($"Time left to code to complete the goal: [darkorange bold]{weeklyGoalStats.TimeLeft}[/]\n");

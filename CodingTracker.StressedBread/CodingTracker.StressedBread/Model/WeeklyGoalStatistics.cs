@@ -1,5 +1,9 @@
 ﻿namespace CodingTracker.StressedBread.Model;
 
+/// <summary>
+/// Represents the data of the weekly coding statistics from the database.
+/// </summary>
+
 internal class WeeklyGoalStatistics
 {
     public TimeSpan Goal { get; set; }

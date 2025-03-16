@@ -5,6 +5,10 @@ using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.Helpers;
 
+/// <summary>
+/// Handles the date and duration validation.
+/// </summary>
+
 internal class Validation
 {
     internal DateTime DateTimeValidation(string time, FilterPeriod? filterPeriod = null)

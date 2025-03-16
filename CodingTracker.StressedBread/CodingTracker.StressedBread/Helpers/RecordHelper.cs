@@ -4,12 +4,18 @@ using CodingTracker.StressedBread.UI;
 using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.Helpers;
+
+/// <summary>
+///  The RecordHelper class provides methods for interacting with coding session records, including viewing, adding, editing, deleting, filtering, generating reports, and updating goals. 
+/// </summary>
+
 internal class RecordHelper
 {
     CodingController codingController = new();
     MainHelpers mainHelpers = new();
     Validation validation = new();
     RecordUI recordUI = new();
+    StringFormatting stringFormatting = new();
 
     internal void ViewRecordsHelper()
     {
@@ -18,28 +24,24 @@ internal class RecordHelper
     }
     internal void AddRecordHelper()
     {
-        string startDateTimeOut, endDateTimeOut;
-        int durationOut;
-
         DateTime startDateTime = validation.DateTimeValidation(recordUI.GetInput("start"));
         DateTime endDateTime = validation.DateTimeValidation(recordUI.GetInput("end"));
 
-        (startDateTimeOut, endDateTimeOut, durationOut) = mainHelpers.GetInputAndDuration(startDateTime, endDateTime);
+        var inputAndDur = stringFormatting.GetInputAndDuration(startDateTime, endDateTime);
 
-        if (!validation.DurationValidation(durationOut))
+        if (!validation.DurationValidation(inputAndDur.Duration))
         {
             recordUI.ShowInvalidDurationMessage();
             return;
         }
 
-        CodingSession newSession = new(startDateTimeOut.ToString(), endDateTimeOut.ToString(), durationOut);
+        CodingSession newSession = new(inputAndDur.StartDateTime.ToString(), inputAndDur.EndDateTime.ToString(), inputAndDur.Duration);
         codingController.AddRecordQuery(newSession);
         codingController.GoalDurationQuery();
     }
     internal void EditRecordHelper()
     {
-        string startDateTimeOut, endDateTimeOut, startTemp, endTemp;
-        int durationOut;
+        string startTemp, endTemp;
 
         var recordToEdit = recordUI.RecordToSelect("edit");
 
@@ -70,15 +72,15 @@ internal class RecordHelper
                 break;
         }
 
-        (startDateTimeOut, endDateTimeOut, durationOut) = mainHelpers.GetInputAndDuration(newStartDateTime, newEndDateTime, recordToEdit, editChoice);
+       var inputAndDur = stringFormatting.GetInputAndDuration(newStartDateTime, newEndDateTime, recordToEdit, editChoice);
 
-        if (!validation.DurationValidation(durationOut))
+        if (!validation.DurationValidation(inputAndDur.Duration))
         {
             recordUI.ShowInvalidDurationMessage();
             return;
         }
 
-        CodingSession codingSession = new(recordToEdit.Id, startDateTimeOut, endDateTimeOut, durationOut);
+        CodingSession codingSession = new(recordToEdit.Id, inputAndDur.StartDateTime, inputAndDur.EndDateTime, inputAndDur.Duration);
         codingController.EditRecordQuery(codingSession);
         codingController.GoalDurationQuery();
 
@@ -97,16 +99,16 @@ internal class RecordHelper
 
     }
     internal void FilterRecordsHelper()
-    {
-        FilterPeriod filterPeriodOut;
-        FilterType filterTypeOut;
+    {        
         AscendingType ascendingTypeOut;
         bool isAscending;
         string? startTemp = "", endTemp = "", startLabel = "", endLabel = "";
         DateTime startTime = DateTime.MinValue;
         DateTime endTime = DateTime.MinValue;
 
-        (filterPeriodOut, filterTypeOut) = recordUI.GetFilterChoice();
+        var filterChoice = recordUI.GetFilterChoice();
+        FilterPeriod filterPeriodOut = filterChoice.FilterPeriod;
+        FilterType filterTypeOut = filterChoice.FilterType;
 
         switch (filterPeriodOut)
         {
@@ -137,12 +139,12 @@ internal class RecordHelper
             if (filterPeriodOut != FilterPeriod.Week)
             {
                 startTime = validation.DateTimeValidation(startTemp, filterPeriodOut);
-                startTemp = mainHelpers.FormattedDateTimeFilter(startTime, filterPeriodOut);
+                startTemp = stringFormatting.FormattedDateTimeFilter(startTime, filterPeriodOut);
             }
             else
             {
                 startTemp = validation.ValidateWeekAndYear(startTemp);
-                startTemp = mainHelpers.FormattedDateTimeFilter(startTime, filterPeriodOut, startTemp);
+                startTemp = stringFormatting.FormattedDateTimeFilter(startTime, filterPeriodOut, startTemp);
             }
         }
         if (requiresEnd) 
@@ -151,12 +153,12 @@ internal class RecordHelper
             if (filterPeriodOut != FilterPeriod.Week)
             {
                 endTime = validation.DateTimeValidation(endTemp, filterPeriodOut);
-                endTemp = mainHelpers.FormattedDateTimeFilter(endTime, filterPeriodOut);
+                endTemp = stringFormatting.FormattedDateTimeFilter(endTime, filterPeriodOut);
             }
             else
             {
                 endTemp = validation.ValidateWeekAndYear(endTemp);
-                endTemp = mainHelpers.FormattedDateTimeFilter(endTime, filterPeriodOut,endTemp);
+                endTemp = stringFormatting.FormattedDateTimeFilter(endTime, filterPeriodOut,endTemp);
             }
         } 
 
@@ -168,9 +170,8 @@ internal class RecordHelper
             isAscending = recordUI.IsAscending();
             records = codingController.FilteredRecordsQuery(filterPeriodOut, filterTypeOut, startTemp, endTemp, isAscending, ascendingTypeOut);
             recordUI.DisplayData(records, true, true);
+            Console.ReadKey();
         }
-
-        Console.ReadKey();
     }
     internal void ReportHelper()
     {

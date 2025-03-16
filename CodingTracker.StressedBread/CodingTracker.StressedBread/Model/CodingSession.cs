@@ -2,6 +2,9 @@
 
 namespace CodingTracker.StressedBread.Model;
 
+/// <summary>
+/// Represents data of the coding session from database.
+/// </summary>
 internal class CodingSession
 {
     public long Id { get; set; }

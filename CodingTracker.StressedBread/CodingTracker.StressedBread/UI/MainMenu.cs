@@ -4,6 +4,10 @@ using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.UI;
 
+/// <summary>
+/// Handles the Main Menu UI.
+/// </summary>
+
 internal class MainMenu
 {
     RecordHelper recordHelper = new();

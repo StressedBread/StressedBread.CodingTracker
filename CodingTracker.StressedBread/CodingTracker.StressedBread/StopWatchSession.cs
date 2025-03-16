@@ -6,12 +6,17 @@ using System.Diagnostics;
 
 namespace CodingTracker.StressedBread;
 
+/// <summary>
+/// Handles live coding session using a StopWatch.
+/// </summary>
+
 internal class StopWatchSession
 {
     MainHelpers mainHelpers = new();
     CodingController codingController = new();
     public Stopwatch stopwatch = new();
     RecordUI recordUI = new();
+    StringFormatting stringFormatting = new();
 
     internal void StartSession()
     {
@@ -33,12 +38,10 @@ internal class StopWatchSession
     internal void SaveSession(DateTime startTime)
     {
         DateTime endTime = DateTime.Now;
-        string startFormattedTime, endFormattedTime;
-        int durationOut;
 
-        (startFormattedTime, endFormattedTime, durationOut) =  mainHelpers.GetInputAndDuration(startTime, endTime);
+        var inputAndDur = stringFormatting.GetInputAndDuration(startTime, endTime);
 
-        CodingSession codingSession = new(startFormattedTime, endFormattedTime, durationOut);
+        CodingSession codingSession = new(inputAndDur.StartDateTime, inputAndDur.EndDateTime, inputAndDur.Duration);
         codingController.AddRecordQuery(codingSession);
         codingController.GoalDurationQuery();
     }
@@ -47,5 +50,4 @@ internal class StopWatchSession
         TimeSpan elapsed = stopwatch.Elapsed;
         return elapsed.ToString(@"hh\:mm\:ss");
     }
-
 }
