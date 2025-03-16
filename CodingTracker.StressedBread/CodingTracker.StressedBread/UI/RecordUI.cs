@@ -13,7 +13,6 @@ namespace CodingTracker.StressedBread.UI;
 internal class RecordUI
 {
     CodingController codingController = new();
-    MainHelpers mainHelpers = new();
     StringFormatting stringFormatting = new();
 
     internal bool DisplayData(List<CodingSession> records, bool filtered, bool notOrder = true)

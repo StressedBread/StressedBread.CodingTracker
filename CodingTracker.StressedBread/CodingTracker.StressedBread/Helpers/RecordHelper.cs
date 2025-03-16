@@ -44,9 +44,11 @@ internal class RecordHelper
         string startTemp, endTemp;
 
         var recordToEdit = recordUI.RecordToSelect("edit");
+        var recordToDisplay = new List<CodingSession>{ recordToEdit };
 
         Console.Clear();
 
+        recordUI.DisplayData(recordToDisplay, true);
         var editChoice = recordUI.GetEditChoice();
 
         DateTime newStartDateTime = DateTime.Parse(recordToEdit.StartTime);
