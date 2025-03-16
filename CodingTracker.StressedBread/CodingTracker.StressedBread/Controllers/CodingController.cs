@@ -1,6 +1,5 @@
 ﻿using CodingTracker.StressedBread.Model;
 using Dapper;
-using Spectre.Console;
 using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.Controllers;

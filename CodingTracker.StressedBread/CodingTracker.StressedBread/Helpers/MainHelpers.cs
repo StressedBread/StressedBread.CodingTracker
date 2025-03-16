@@ -1,7 +1,5 @@
-﻿using CodingTracker.StressedBread.Model;
-using Spectre.Console;
+﻿using Spectre.Console;
 using System.Configuration;
-using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.Helpers;
 

@@ -29,7 +29,7 @@ class StringFormatting
                 return dateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             case FilterPeriod.Week:
                 string[] parts = week.Split('/');
-                return $"{parts[1]}-{parts[0]}"; ;
+                return $"{parts[1]}-{parts[0]}";
             case FilterPeriod.Month:
                 return dateTime.ToString("yyyy-MM", CultureInfo.InvariantCulture);
             case FilterPeriod.Year:
