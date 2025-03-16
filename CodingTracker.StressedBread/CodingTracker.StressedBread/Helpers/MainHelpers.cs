@@ -1,4 +1,6 @@
 ﻿using CodingTracker.StressedBread.Model;
+using Spectre.Console;
+using System.Configuration;
 using static CodingTracker.StressedBread.Enums;
 
 namespace CodingTracker.StressedBread.Helpers;
@@ -26,7 +28,18 @@ class MainHelpers
     }
     internal void CreateDatabaseFolder()
     {
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "Database");
+        string? dbPath = ConfigurationManager.AppSettings["DBPath"];
+        string path;
+        if (string.IsNullOrEmpty(dbPath))
+        {
+            AnsiConsole.MarkupLine("[red bold]Database folder path not in config file! Setting the path manually.[/]");
+            Thread.Sleep(2000);
+            path = Path.Combine(Directory.GetCurrentDirectory(), "Database");
+        }
+        else
+        {
+            path = Path.Combine(Directory.GetCurrentDirectory(), dbPath);
+        }            
 
         if (!Directory.Exists(path))
         {
