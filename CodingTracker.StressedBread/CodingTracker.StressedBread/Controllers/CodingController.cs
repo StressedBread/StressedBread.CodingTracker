@@ -7,6 +7,7 @@ namespace CodingTracker.StressedBread.Controllers;
 internal class CodingController
 {
     DatabaseController databaseController = new();
+
     internal void CreateTableOnStartQuery()
     {
         var queryCodingTable = @"
@@ -42,12 +43,14 @@ internal class CodingController
         databaseController.Execute(queryInsertFirstRow);
         if (string.IsNullOrEmpty(triggerExists)) databaseController.Execute(queryTrigger);
     }
+
     internal List<CodingSession> ViewRecordsQuery()
     {
         var query = @"
             SELECT * FROM CodingTracker";
         return databaseController.Reader(query);
     }
+
     internal void AddRecordQuery(CodingSession session)
     {
         var query = @"
@@ -62,6 +65,7 @@ internal class CodingController
 
         databaseController.Execute(query, parameters);
     }
+
     internal void EditRecordQuery(CodingSession session)
     {
         DynamicParameters parameters = new();
@@ -98,6 +102,7 @@ internal class CodingController
 
         databaseController.Execute(query, parameters);
     }
+
     internal void DeleteRecordQuery(long id)
     {
         var query = @"
@@ -110,6 +115,7 @@ internal class CodingController
 
         databaseController.Execute(query, parameters);
     }
+
     internal List<CodingSession> FilteredRecordsQuery(FilterPeriod filterPeriod, FilterType filterType, string? startDateTime, string? endDateTime, bool isAscending = true, AscendingType ascendingType = AscendingType.Id)
     {
         DynamicParameters parameters = new();
@@ -147,6 +153,7 @@ internal class CodingController
 
         return databaseController.Reader(query, parameters);
     }
+    
     internal CodingStatistics SumDurationQuery()
     {
         string sumDurationQuery = @"SELECT SUM(Duration) FROM CodingTracker";
@@ -166,6 +173,7 @@ internal class CodingController
 
         return new(sumDuration, lastWeekDuration, thisYearDuration);
     }
+
     internal CodingStatistics AvgDurationQuery()
     {
         string avgDurationQuery = @"SELECT AVG(Duration) FROM CodingTracker";
@@ -184,6 +192,7 @@ internal class CodingController
 
         return new(avgDuration, lastWeekDuration, thisYearDuration);
     }
+
     internal void UpdateGoalQuery(int hours)
     {
         DynamicParameters parameters = new();
@@ -196,6 +205,7 @@ internal class CodingController
 
         GoalDurationQuery();
     }
+
     internal WeeklyGoalStatistics ViewGoalQuery()
     {
         var query = @"SELECT 
@@ -205,6 +215,7 @@ internal class CodingController
                     FROM CodingGoal";
         return databaseController.WeeklyGoalReader(query);
     }
+
     internal double GetDaysLeftToMonday()
     {
         var query = @"SELECT (strftime('%s', date('now', 'weekday 0', '+1 days')) 
@@ -212,6 +223,7 @@ internal class CodingController
                     / 86400";
         return databaseController.DaysToMonday(query);
     }
+
     internal void GoalDurationQuery()
     {
         DynamicParameters parameters = new();
@@ -226,15 +238,15 @@ internal class CodingController
                     LeftCodingTime AS timeLeft, 
                     CodedThisWeek AS timeCoded
                     FROM CodingGoal";
+
         var goalStats = databaseController.WeeklyGoalReader(query);
-
         double goal = goalStats.Goal.TotalSeconds;
-
         double lastWeekDuration = databaseController.SumDurationReader(lastWeekDurationQuery);
 
         var updateQuery = @"UPDATE CodingGoal 
                       SET CodedThisWeek = @duration
                       WHERE ROWID = 1";
+
         parameters.Add("@duration", lastWeekDuration);
 
         double result = goal - lastWeekDuration;
@@ -243,12 +255,14 @@ internal class CodingController
 
         databaseController.Execute(updateQuery, parameters);
     }
+
     internal void SetTimeLeftQuery(double timeLeft)
     {
         DynamicParameters parameters = new();
         var updateQuery = @"UPDATE CodingGoal 
                       SET LeftCodingTime = @duration
                       WHERE ROWID = 1";
+
         parameters.Add("@duration", timeLeft);
 
         databaseController.Execute(updateQuery, parameters);

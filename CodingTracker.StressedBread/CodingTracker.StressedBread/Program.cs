@@ -9,6 +9,7 @@ using CodingTracker.StressedBread.UI;
 MainMenu ui = new();
 CodingController codingController = new();
 MainHelpers mainHelpers = new MainHelpers();
+StringFormatting stringFormatting = new();
 
 mainHelpers.CreateDatabaseFolder();
 codingController.CreateTableOnStartQuery();

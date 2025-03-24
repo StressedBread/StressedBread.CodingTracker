@@ -22,16 +22,16 @@ internal class RecordHelper
         var records = codingController.ViewRecordsQuery();
         if (recordUI.DisplayData(records, false)) FilterRecordsHelper();
     }
+
     internal void AddRecordHelper()
     {
         DateTime startDateTime = validation.DateTimeValidation(recordUI.GetInput("start"));
         DateTime endDateTime = validation.DateTimeValidation(recordUI.GetInput("end"));
-
         var inputAndDur = stringFormatting.GetInputAndDuration(startDateTime, endDateTime);
 
         if (!validation.DurationValidation(inputAndDur.Duration))
         {
-            recordUI.ShowInvalidDurationMessage();
+            recordUI.ShowInvalidMessage("Duration");
             return;
         }
 
@@ -39,11 +39,13 @@ internal class RecordHelper
         codingController.AddRecordQuery(newSession);
         codingController.GoalDurationQuery();
     }
+
     internal void EditRecordHelper()
     {
         string startTemp, endTemp;
 
         var recordToEdit = recordUI.RecordToSelect("edit");
+        if (recordToEdit == null) return;
         var recordToDisplay = new List<CodingSession>{ recordToEdit };
 
         Console.Clear();
@@ -78,7 +80,7 @@ internal class RecordHelper
 
         if (!validation.DurationValidation(inputAndDur.Duration))
         {
-            recordUI.ShowInvalidDurationMessage();
+            recordUI.ShowInvalidMessage("Duration");
             return;
         }
 
@@ -88,18 +90,22 @@ internal class RecordHelper
 
         recordUI.ShowSuccessMessage("updated");
     }
+
     internal void DeleteRecordHelper()
     {        
         var recordToDelete = recordUI.RecordToSelect("delete");
+        if (recordToDelete == null) return;
+
         Console.Clear();
+
         if (recordUI.ConfirmationPrompt("Are you sure?"))
         {
             codingController.DeleteRecordQuery(recordToDelete.Id);
             codingController.GoalDurationQuery();
             recordUI.ShowSuccessMessage("deleted");
         }
-
     }
+
     internal void FilterRecordsHelper()
     {        
         AscendingType ascendingTypeOut;
@@ -164,6 +170,12 @@ internal class RecordHelper
             }
         } 
 
+        if (endTime < startTime)
+        {
+            recordUI.ShowInvalidMessage("Date");
+            return;
+        }
+
         var records = codingController.FilteredRecordsQuery(filterPeriodOut, filterTypeOut, startTemp, endTemp);
 
         if (recordUI.DisplayData(records, true, false))
@@ -175,6 +187,7 @@ internal class RecordHelper
             Console.ReadKey();
         }
     }
+
     internal void ReportHelper()
     {
         var sumRecords = codingController.SumDurationQuery();
@@ -187,6 +200,7 @@ internal class RecordHelper
         recordUI.DisplayReport(sumRecords, avgRecords, weeklyGoal, timePerDay);
         Console.ReadKey();
     }
+
     internal void GoalHelper()
     {
         int weeklyGoal = recordUI.GetWeeklyGoal();

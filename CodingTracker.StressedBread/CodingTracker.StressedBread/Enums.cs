@@ -3,6 +3,7 @@
 /// <summary>
 /// Stores all the enum values.
 /// </summary>
+
 internal class Enums
 {
     internal enum MenuChoice

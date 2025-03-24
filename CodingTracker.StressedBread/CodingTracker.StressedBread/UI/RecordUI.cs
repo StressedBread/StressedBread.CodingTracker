@@ -10,6 +10,7 @@ namespace CodingTracker.StressedBread.UI;
 /// <summary>
 /// Handles all the UI for displaying data, reports and goal. Also handles the UI side of user input. 
 /// </summary>
+
 internal class RecordUI
 {
     CodingController codingController = new();
@@ -18,6 +19,14 @@ internal class RecordUI
     internal bool DisplayData(List<CodingSession> records, bool filtered, bool notOrder = true)
     {
         Console.Clear();
+
+        if (records.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[red]No records found. Press any key to return to menu[/]");
+            Console.ReadKey();
+            return false;
+        }
+
         Table table = new();
 
         table.AddColumn("Id");
@@ -58,9 +67,18 @@ internal class RecordUI
 
         return false;
     }
-    internal CodingSession RecordToSelect(string op)
+
+    internal CodingSession? RecordToSelect(string op)
     {
         var records = codingController.ViewRecordsQuery();
+
+        if (records.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[red]No records found. Press any key to return to menu[/]");
+            Console.ReadKey();
+            return null;
+        }
+
         string format = "dd/MM/yyyy HH:mm:ss";
 
         AnsiConsole.MarkupLine($"[darkorange bold]Select a record to {op}.[/]\n");
@@ -68,30 +86,45 @@ internal class RecordUI
         AnsiConsole.MarkupLine("  | Start Time          | End Time            | Duration    |");
         AnsiConsole.MarkupLine("  |---------------------|---------------------|-------------|");
 
-        return AnsiConsole.Prompt(new SelectionPrompt<CodingSession>()
-            .PageSize(20)
-            .UseConverter(r =>
-            {
+        if (records.Count == 1)
+        {
+            AnsiConsole.MarkupLine($"  | {DateTime.Parse(records[0].StartTime).ToString(format),-18} " +
+                $"| {DateTime.Parse(records[0].EndTime).ToString(format),-18} " +
+                $"| {stringFormatting.FormattedDuration(records[0].Duration),-11} |");
+            AnsiConsole.MarkupLine("\n[darkorange bold]Only one record found. Record selected automatically. Press any key to continue[/]");
+            Console.ReadKey();
+            return records[0];
+        }
 
-                return $"| {DateTime.Parse(r.StartTime).ToString(format),-18} " +
-                        $"| {DateTime.Parse(r.EndTime).ToString(format),-18} " +
-                        $"| {stringFormatting.FormattedDuration(r.Duration),-11} |";
-            })
-            .AddChoices(records));
+        else
+        {
+
+            return AnsiConsole.Prompt(new SelectionPrompt<CodingSession>()
+                .PageSize(20)
+                .UseConverter(r =>
+                {
+                    return $"| {DateTime.Parse(r.StartTime).ToString(format),-18} " +
+                            $"| {DateTime.Parse(r.EndTime).ToString(format),-18} " +
+                            $"| {stringFormatting.FormattedDuration(r.Duration),-11} |";
+                })
+                .AddChoices(records));
+        }
     }
+
     internal EditChoice GetEditChoice()
     {
         return AnsiConsole.Prompt(new SelectionPrompt<EditChoice>()
             .Title("Select what to edit")
             .AddChoices(Enum.GetValues<EditChoice>()));
     }
+
     internal string GetInput(string inputType, FilterPeriod filterPeriod = FilterPeriod.Day)
     {
         switch (filterPeriod)
         {
             case FilterPeriod.Day:
-                AnsiConsole.MarkupLine($"Enter the [darkorange]{inputType}[/] date and time of the coding session in the format:" + 
-                    "\n[darkorange bold]Day(s)/Month(s)/Year Hour(s):Minute(s):Second(s) (24-hour format)[/]\n" + 
+                AnsiConsole.MarkupLine($"Enter the [darkorange]{inputType}[/] date and time of the coding session in the format:" +
+                    "\n[darkorange bold]Day(s)/Month(s)/Year Hour(s):Minute(s):Second(s) (24-hour format)[/]\n" +
                     "[red bold]If filtering, exlude time![/]");
                 return AnsiConsole.Ask<string>("");
 
@@ -109,25 +142,29 @@ internal class RecordUI
 
             default:
                 return "Invalid";
-        }        
+        }
     }
-    internal void ShowInvalidDurationMessage()
+
+    internal void ShowInvalidMessage(string message)
     {
         Console.Clear();
-        AnsiConsole.MarkupLine("[red]Invalid input. Duration cannot be negative. Press any key to return to menu[/]");
+        AnsiConsole.MarkupLine($"[red]Invalid input. {message} cannot be negative. Press any key to return to menu[/]");
         Console.ReadKey();
     }
+
     internal void ShowSuccessMessage(string op)
     {
         Console.Clear();
         AnsiConsole.MarkupLine($"[green]Record {op} successfully. Press any key to return to menu[/]");
         Console.ReadKey();
     }
+
     internal bool ConfirmationPrompt(string text)
     {
         bool confirmation = AnsiConsole.Prompt(new ConfirmationPrompt(text));
         return confirmation;
     }
+
     internal bool StartCodingSessionDisplay(StopWatchSession stopWatchSession, ref bool isRunning)
     {
         Console.Clear();
@@ -156,8 +193,10 @@ internal class RecordUI
             AnsiConsole.Markup($"Elapsed time:[grey50] {stopWatchSession.GetFormattedElapsedTime()}[/]");
             Thread.Sleep(1000);
         }
+
         return false;
-    }    
+    }
+
     internal FilterChoice GetFilterChoice()
     {
         return new(
@@ -167,15 +206,16 @@ internal class RecordUI
 
             AnsiConsole.Prompt(new SelectionPrompt<FilterType>()
             .Title("\nSelect the type to filter")
-            .AddChoices(Enum.GetValues<FilterType>()))
-            );
+            .AddChoices(Enum.GetValues<FilterType>())));
     }
+
     internal AscendingType FilterOrder()
     {
         return AnsiConsole.Prompt(new SelectionPrompt<AscendingType>()
             .Title("Choose the column to order by.")
             .AddChoices(Enum.GetValues<AscendingType>()));
     }
+
     internal bool IsAscending()
     {
         return AnsiConsole.Prompt(new SelectionPrompt<bool>()
@@ -187,6 +227,7 @@ internal class RecordUI
                 false => "Descending"
             }));
     }
+
     internal void DisplayReport(CodingStatistics sumStats, CodingStatistics avgStats, WeeklyGoalStatistics weeklyGoalStats, TimeSpan timePerDay)
     {
         AnsiConsole.MarkupLine($"Your total coding time is: [darkorange bold]{sumStats.TotalDuration.Days} days, {sumStats.TotalDuration.Hours} hours, " +
@@ -208,6 +249,7 @@ internal class RecordUI
 
         AnsiConsole.MarkupLine($"You would have to code [darkorange bold]{timePerDay.Hours}:{timePerDay.Minutes}:{timePerDay.Seconds}[/] per day to reach your goal.");
     }
+
     internal int GetWeeklyGoal()
     {
         AnsiConsole.MarkupLine($"Enter new weekly coding goal in [darkorange]hours.[/]");
@@ -217,6 +259,7 @@ internal class RecordUI
             AnsiConsole.MarkupLine($"[red]Goal can't be negative![/]");
             result = AnsiConsole.Ask<int>("");
         }
+
         return result;
     }
 }

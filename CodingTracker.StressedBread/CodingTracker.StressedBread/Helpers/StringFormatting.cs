@@ -17,10 +17,12 @@ class StringFormatting
         int totalHours = (int)timeSpan.TotalHours;
         return $"{totalHours}h {timeSpan.Minutes}m {timeSpan.Seconds}s";
     }
+
     internal string FormattedDateTime(DateTime dateTime)
     {
         return dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
     }
+
     internal string FormattedDateTimeFilter(DateTime dateTime, FilterPeriod filterPeriod, string week = "")
     {
         switch (filterPeriod)
@@ -38,6 +40,7 @@ class StringFormatting
 
         return "Invalid Input!";
     }
+
     internal InputAndDuration GetInputAndDuration(DateTime startDateTime, DateTime endDateTime)
     {
         string startFormattedTime = FormattedDateTime(startDateTime);
@@ -47,6 +50,7 @@ class StringFormatting
 
         return new(startFormattedTime, endFormattedTime, duration);
     }
+
     internal InputAndDuration GetInputAndDuration(DateTime startDateTime, DateTime endDateTime, CodingSession recordToEdit, EditChoice editChoice)
     {
         string startFormattedTime = recordToEdit.StartTime;

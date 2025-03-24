@@ -17,6 +17,7 @@ internal class DatabaseController
             connection.Execute(query, parameters);
         }
     }
+
     internal List<CodingSession> Reader(string query, object? parameters = null)
     {
         using (var connection = new SqliteConnection(connectionString))
@@ -25,6 +26,7 @@ internal class DatabaseController
             return connection.Query<CodingSession>(query, parameters).ToList();
         }
     }
+
     internal double SumDurationReader(string query)
     {
         using (var connection = new SqliteConnection(connectionString))
@@ -33,6 +35,7 @@ internal class DatabaseController
             return connection.QuerySingleOrDefault<double?>(query) ?? 0;
         }
     }
+
     internal double AvgDurationReader(string query)
     {
         using (var connection = new SqliteConnection(connectionString))
@@ -41,6 +44,7 @@ internal class DatabaseController
             return connection.QuerySingleOrDefault<double?>(query) ?? 0;
         }
     }
+
     internal string? TriggerExists(string query)
     {
         using (var connection = new SqliteConnection(connectionString))
@@ -49,6 +53,7 @@ internal class DatabaseController
             return connection.QuerySingleOrDefault<string?>(query) ?? null;
         }
     }
+
     internal WeeklyGoalStatistics WeeklyGoalReader(string query)
     {
         using (var connection = new SqliteConnection(connectionString))
@@ -63,6 +68,7 @@ internal class DatabaseController
             return new(goalInHours, timeLeftInSeconds, timeCodedInSeconds);
         }
     }
+
     internal double DaysToMonday(string query)
     {
         using (var connection = new SqliteConnection(connectionString))

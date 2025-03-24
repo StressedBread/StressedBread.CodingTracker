@@ -13,17 +13,20 @@ class MainHelpers
     {
         Environment.Exit(0);
     }
+
     internal int DurationCalculation(DateTime startTime, DateTime endTime)
     {
         double duration = (endTime - startTime).TotalSeconds;
         return (int)Math.Round(duration);
     }    
+
     internal TimeSpan CalculateCodingPerDay(double daysToMonday, TimeSpan timeLeft)
     {
         TimeSpan timeToMonday = TimeSpan.FromDays(daysToMonday);
         double result = timeLeft/timeToMonday;
         return TimeSpan.FromDays(result);
     }
+
     internal void CreateDatabaseFolder()
     {
         string? dbPath = ConfigurationManager.AppSettings["DBPath"];

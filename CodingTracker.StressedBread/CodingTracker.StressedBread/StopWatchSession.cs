@@ -12,7 +12,6 @@ namespace CodingTracker.StressedBread;
 
 internal class StopWatchSession
 {
-    MainHelpers mainHelpers = new();
     CodingController codingController = new();
     public Stopwatch stopwatch = new();
     RecordUI recordUI = new();
@@ -24,7 +23,6 @@ internal class StopWatchSession
         stopwatch.Start();
 
         DateTime startTime = DateTime.Now;
-
         bool isRunning = true, saveSession;
 
         saveSession = recordUI.StartCodingSessionDisplay(this, ref isRunning);
@@ -35,6 +33,7 @@ internal class StopWatchSession
 
         stopwatch.Stop();
     }
+
     internal void SaveSession(DateTime startTime)
     {
         DateTime endTime = DateTime.Now;
@@ -45,6 +44,7 @@ internal class StopWatchSession
         codingController.AddRecordQuery(codingSession);
         codingController.GoalDurationQuery();
     }
+
     internal string GetFormattedElapsedTime()
     {
         TimeSpan elapsed = stopwatch.Elapsed;

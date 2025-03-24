@@ -38,7 +38,6 @@ internal class Validation
         };
 
         bool isWeek = false;
-
         DateTime date;
         
         switch (filterPeriod)
@@ -58,6 +57,7 @@ internal class Validation
                 format = formattedDateTime;
                 break;
         }
+
         if (!isWeek)
         {
             while (string.IsNullOrEmpty(time) || !DateTime.TryParseExact(time, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
@@ -75,8 +75,10 @@ internal class Validation
                 }
             }            
         }
+
         return date = DateTime.ParseExact(time, format, CultureInfo.InvariantCulture);
     }
+
     internal string ValidateWeekAndYear(string input)
     {
         string weekPattern = @"^(0[0-9]|[1-4][0-9]|5[0-3])/\b((19|20)\d{2})\b";
@@ -92,6 +94,7 @@ internal class Validation
 
         return input; 
     }
+
     internal bool DurationValidation(int duration)
     {
         return duration >= 0;
